@@ -39,7 +39,7 @@
   .toplinks{display:flex;gap:4px 22px;flex-wrap:wrap;font-size:.9rem}
 
   /* 本 */
-  .shelf{padding:8px 0 0}
+  .shelf{padding:28px 0 0}
   #book{width:100%;max-width:1100px;height:min(76vh,760px);min-height:380px;margin:0 auto;visibility:hidden}
   #book.ready{visibility:visible}
 
@@ -75,14 +75,7 @@
 </head>
 <body>
 
-<header class="wrap top">
-  <h1 class="title" id="zineTitle" hidden>ZINE</h1>
-  <span></span>
-  <nav class="toplinks" aria-label="ほかのページ">
-    <a href="lab.html">写真を加工して遊ぶ</a>
-    <a href="https://mee1215r.github.io/portfolio-site/">ポートフォリオ</a>
-  </nav>
-</header>
+<h1 class="sr">ZINE</h1>
 
 <main class="wrap shelf">
   <div id="book" aria-label="ZINE。ページをめくって読めます"></div>
@@ -145,7 +138,6 @@ function photoPage(src, alt, pos, word, small, side, placeTop){
   const w = el('div', 'word ' + (placeTop ? "up" : "bot") + (side === 'r' ? ' rt' : ''), '<span class="wt">' + fmt(word) + '</span>');
   w.style.fontSize = fit(word, 40) + 'cqw'; w.setAttribute('aria-hidden', 'true');
   pg.appendChild(w);
-  pg.appendChild(el('div', 'small ' + (placeTop ? 't' : 'b') + (side === 'l' ? 'l' : 'r'), esc(small)));
   return pg;
 }
 function wrap(pg, hard){ const p = el('div', 'page'); if (hard) p.dataset.density = 'hard'; p.appendChild(pg); return p; }
@@ -156,7 +148,6 @@ const book = $('book');
   const c = photoPage(SPREADS[1].photo, SPREADS[1].alt, '58% 50%', '*ro*se', '', 'r', false);
   c.classList.remove('r'); c.classList.add('r');
   c.querySelector('.word').style.fontSize = '46cqw';
-  c.querySelector('.small').className = 'small tl';
   book.appendChild(wrap(c, true));
 }
 /* 中身 */
@@ -176,7 +167,6 @@ SPREADS.forEach((s, i) => {
   book.appendChild(wrap(pg, true));
 }
 document.title = '2026.11.24';
-$('zineTitle').textContent = TITLE;
 
 /* ============================================================
    めくる
