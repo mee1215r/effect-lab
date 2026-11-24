@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>無題(仮) | 写真と加工したものを貼ったZINE</title>
+<title>2026.11.24</title>
 <meta name="description" content="バラや花の写真と、ドット絵風・網点・色ずれなどで加工した写真を貼り込んだ、ページをめくって読むZINE。">
 <link rel="canonical" href="https://mee1215r.github.io/effect-lab/">
 <meta name="theme-color" content="#E8E8E4">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="無題(仮)">
-<meta property="og:title" content="無題(仮) | 写真と加工したものを貼ったZINE">
+<meta property="og:site_name" content="2026.11.24">
+<meta property="og:title" content="2026.11.24">
 <meta property="og:description" content="ページをめくって読む、写真のZINE。">
 <meta property="og:url" content="https://mee1215r.github.io/effect-lab/">
 <meta property="og:image" content="https://mee1215r.github.io/effect-lab/photos/02.jpg">
@@ -43,11 +43,11 @@
   #book{width:100%;max-width:1100px;height:min(76vh,760px);min-height:380px;margin:0 auto;visibility:hidden}
   #book.ready{visibility:visible}
 
-  .controls{position:relative;z-index:20;display:flex;justify-content:center;align-items:baseline;gap:8px 28px;flex-wrap:wrap;padding:18px 0 6px}
-  .controls button{all:unset;box-sizing:border-box;cursor:pointer;font-size:.95rem;border-bottom:2px solid var(--ink);padding:2px 0;line-height:1.6}
+  .controls{position:relative;z-index:20;display:flex;justify-content:center;align-items:center;gap:8px 40px;flex-wrap:wrap;padding:18px 0 6px}
+  .controls button{all:unset;box-sizing:border-box;cursor:pointer;font-family:var(--serif);font-size:2rem;line-height:1;padding:4px 18px}
   .controls button:disabled{opacity:.3;cursor:default}
   .controls button:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
-  #pos{min-width:9em;text-align:center;font-size:.9rem;color:var(--sub);font-variant-numeric:tabular-nums}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
   .hint{position:relative;z-index:20;margin:4px 0 0;text-align:center;font-size:.82rem;color:var(--sub)}
   footer{padding:36px 0 40px;text-align:center;font-size:.82rem;color:var(--sub)}
 
@@ -76,7 +76,8 @@
 <body>
 
 <header class="wrap top">
-  <h1 class="title" id="zineTitle">無題(仮)</h1>
+  <h1 class="title" id="zineTitle" hidden>ZINE</h1>
+  <span></span>
   <nav class="toplinks" aria-label="ほかのページ">
     <a href="lab.html">写真を加工して遊ぶ</a>
     <a href="https://mee1215r.github.io/portfolio-site/">ポートフォリオ</a>
@@ -86,11 +87,10 @@
 <main class="wrap shelf">
   <div id="book" aria-label="ZINE。ページをめくって読めます"></div>
   <div class="controls">
-    <button type="button" id="prev">前のページ</button>
-    <span id="pos" aria-live="polite"></span>
-    <button type="button" id="next">次のページ</button>
+    <button type="button" id="prev" aria-label="前のページ">&lt;</button>
+    <span id="pos" class="sr" aria-live="polite"></span>
+    <button type="button" id="next" aria-label="次のページ">&gt;</button>
   </div>
-  <p class="hint">ページの端をドラッグしても、めくれます。キーボードは左右の矢印キーです。</p>
 </main>
 
 <footer>© 2026</footer>
@@ -104,7 +104,7 @@
      wl / wr    : 左右のページの大きな文字(Latin)。*でくくると斜体になります
      tl / tr    : 左右の小さな文字
    ============================================================ */
-const TITLE = '無題(仮)';
+const TITLE = 'ZINE';
 const SPREADS = [
   { photo:'photos/01.jpg', fx:'zine/01_dither.jpg',   pos:'50% 50%', alt:'夕方の空を背景に、白い小さな花が房になって咲く木の枝', altFx:'同じ写真を、2色のドットだけにしたもの',
     wl:'*du*sk',   wr:'*do*t',      tl:'夕空の白い花', tr:'ドット絵風にした' },
@@ -153,7 +153,7 @@ function wrap(pg, hard){ const p = el('div', 'page'); if (hard) p.dataset.densit
 const book = $('book');
 /* 表紙 */
 {
-  const c = photoPage(SPREADS[1].photo, SPREADS[1].alt, '58% 50%', '*ro*se', TITLE + '\n写真と、加工したもの', 'r', false);
+  const c = photoPage(SPREADS[1].photo, SPREADS[1].alt, '58% 50%', '*ro*se', '', 'r', false);
   c.classList.remove('r'); c.classList.add('r');
   c.querySelector('.word').style.fontSize = '46cqw';
   c.querySelector('.small').className = 'small tl';
@@ -175,7 +175,7 @@ SPREADS.forEach((s, i) => {
   pg.appendChild(el('div', 'small bl', '© 2026'));
   book.appendChild(wrap(pg, true));
 }
-document.title = TITLE + ' | 写真と加工したものを貼ったZINE';
+document.title = '2026.11.24';
 $('zineTitle').textContent = TITLE;
 
 /* ============================================================
