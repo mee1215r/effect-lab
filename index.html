@@ -17,7 +17,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --desk:#E8E8E4;
@@ -25,7 +25,7 @@
     --ink:#111111;
     --sub:#55554f;
     --crayon:#D8322A;
-    --serif:"Instrument Serif","Times New Roman","Hiragino Mincho ProN",serif;
+    --serif:"Cormorant Garamond","Times New Roman","Hiragino Mincho ProN",serif;
     --sans:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
   }
   *{box-sizing:border-box}
@@ -59,15 +59,16 @@
   .pg.l::after,.pg.r::after{content:"";position:absolute;top:0;bottom:0;width:7%;pointer-events:none}
   .pg.l::after{right:0;background:linear-gradient(to right,transparent,rgba(0,0,0,.28))}
   .pg.r::after{left:0;background:linear-gradient(to left,transparent,rgba(0,0,0,.28))}
-  .word{position:absolute;left:5cqw;right:5cqw;font-family:var(--serif);font-weight:400;line-height:.82;letter-spacing:-.045em;white-space:nowrap;color:#fff;text-shadow:0 0 5cqw rgba(0,0,0,.28)}
-  .word i{font-style:italic;letter-spacing:-.06em}
+  .word{position:absolute;left:5cqw;right:5cqw;font-family:var(--serif);font-weight:300;line-height:.8;letter-spacing:-.02em;white-space:nowrap;color:#fff;text-shadow:0 0 5cqw rgba(0,0,0,.28)}
+  .word i{font-style:normal}
+  .wt{display:inline-block}
   .word.bot{bottom:9cqw}.word.up{top:7cqw}
   .word.rt{text-align:right}
   .small{position:absolute;font-size:2.7cqw;line-height:1.7;letter-spacing:.06em;color:#fff;text-shadow:0 0 2cqw rgba(0,0,0,.55),0 0 .6cqw rgba(0,0,0,.35)}
   .small.bl{left:5cqw;bottom:4.2cqw}.small.br{right:5cqw;bottom:4.2cqw;text-align:right}
   .small.tl{left:5cqw;top:4.2cqw}.small.tr{right:5cqw;top:4.2cqw;text-align:right}
   .red{background:var(--crayon)}
-  .lk{display:block;font-family:var(--serif);font-size:7.5cqw;line-height:1.25;color:#fff;text-decoration:none;border-bottom:.5cqw solid #fff;width:max-content;margin-bottom:5cqw}
+  .lk{display:block;font-family:var(--serif);font-size:7.5cqw;font-weight:400;line-height:1.25;color:#fff;text-decoration:none;border-bottom:.5cqw solid #fff;width:max-content;margin-bottom:5cqw}
   .lk small{display:block;font-family:var(--sans);font-size:2.7cqw;letter-spacing:.06em}
   .links{position:absolute;left:8cqw;top:34cqh}
 </style>
@@ -124,13 +125,24 @@ const esc = t => t.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c
 /* *ab*cd → <i>ab</i>cd(斜体の部分を指定) */
 const fmt = w => esc(w).replace(/\*(.+?)\*/g, '<i>$1</i>');
 const plain = w => w.replace(/\*/g, '');
-const fit = (w, max) => Math.min(max, 88 / (plain(w).length * 0.43));
+const fit = (w, max) => Math.min(max, 88 / (plain(w).length * 0.4));
+/* 書体の幅に合わせて、はみ出さないよう文字の大きさを調整する */
+const measureCtx = document.createElement('canvas').getContext('2d');
+function fitWords(){
+  measureCtx.font = '300 100px "Cormorant Garamond","Times New Roman",serif';
+  document.querySelectorAll('.word').forEach(w => {
+    if (!w.dataset.cq) w.dataset.cq = parseFloat(w.style.fontSize);
+    const text = w.textContent;
+    const em = (measureCtx.measureText(text).width / 100) - text.length * 0.02;
+    w.style.fontSize = Math.min(+w.dataset.cq, 88 / em) + 'cqw';
+  });
+}
 
 function photoPage(src, alt, pos, word, small, side, placeTop){
   const pg = el('div', 'pg ' + (side === 'l' ? 'l' : 'r'));
   const im = el('img'); im.src = src; im.alt = alt; im.draggable = false; im.style.objectPosition = pos;
   pg.appendChild(im);
-  const w = el('div', 'word ' + (placeTop ? "up" : "bot") + (side === 'r' ? ' rt' : ''), fmt(word));
+  const w = el('div', 'word ' + (placeTop ? "up" : "bot") + (side === 'r' ? ' rt' : ''), '<span class="wt">' + fmt(word) + '</span>');
   w.style.fontSize = fit(word, 40) + 'cqw'; w.setAttribute('aria-hidden', 'true');
   pg.appendChild(w);
   pg.appendChild(el('div', 'small ' + (placeTop ? 't' : 'b') + (side === 'l' ? 'l' : 'r'), esc(small)));
@@ -155,10 +167,10 @@ SPREADS.forEach((s, i) => {
 /* 裏表紙 */
 {
   const pg = el('div', 'pg red');
-  const w = el("div", "word up", fmt('*en*d')); w.style.fontSize = '40cqw'; w.setAttribute('aria-hidden', 'true'); 
+  const w = el("div", "word up", '<span class="wt">' + fmt('*en*d') + '</span>'); w.style.fontSize = '40cqw'; w.setAttribute('aria-hidden', 'true'); 
   pg.appendChild(w);
   const l = el('div', 'links');
-  l.innerHTML = '<a class="lk" href="lab.html">lab<small>写真を加工して遊ぶページ</small></a><a class="lk" href="https://mee1215r.github.io/portfolio-site/">portfolio<small>ポートフォリオ</small></a>';
+  l.innerHTML = '<a class="lk" href="https://mee1215r.github.io/portfolio-site/">portfolio<small>ポートフォリオ</small></a>';
   pg.appendChild(l);
   pg.appendChild(el('div', 'small bl', '© 2026'));
   book.appendChild(wrap(pg, true));
@@ -199,6 +211,8 @@ document.addEventListener('keydown', ev => {
   if (ev.key === 'ArrowLeft'){ pf.flipPrev(); }
   if (ev.key === 'ArrowRight'){ pf.flipNext(); }
 });
+fitWords();
+if (document.fonts && document.fonts.load) document.fonts.load('300 100px "Cormorant Garamond"').then(fitWords, fitWords);
 book.classList.add('ready');
 updatePos();
 </script>
