@@ -61,6 +61,12 @@
   #gate form{display:flex;gap:8px;align-items:center}
   #gate input{border:1px solid var(--line);border-radius:6px;padding:8px 10px;background:#fff;width:14em}
   #gate p{position:absolute;margin:0;top:calc(50% + 34px);font-size:12px;color:#b3261e;min-height:1.4em}
+  dialog{border:0;border-radius:10px;padding:20px 22px;max-width:460px;width:calc(100% - 32px);box-shadow:0 10px 40px rgba(0,0,0,.3)}
+  dialog::backdrop{background:rgba(0,0,0,.35)}
+  dialog h2{margin:0 0 8px;font-size:16px}
+  dialog ol{margin:8px 0 12px;padding-left:1.3em;font-size:13px;line-height:1.7}
+  dialog input[type=password]{width:100%;border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin-bottom:10px}
+  dialog .row{justify-content:flex-end}
   #msg{font-size:12px;color:var(--sub);min-height:1.4em}
   @media (max-width:900px){.main{flex-direction:column}#strip{width:auto;flex-direction:row;border-right:0;border-bottom:1px solid var(--line)}.th{width:70px}#tools{width:auto;border-left:0;border-top:1px solid var(--line)}}
 </style>
@@ -78,7 +84,9 @@
   <button type="button" id="undo">ひとつ戻す</button>
   <button type="button" id="preview">見た目を確認</button>
   <button type="button" id="reset">最初の状態に戻す</button>
-  <button type="button" id="export">書き出す</button>
+  <button type="button" id="export">zipで保存</button>
+  <button type="button" id="gh" title="公開の設定">公開の設定</button>
+  <button type="button" id="publish" style="background:#111;color:#fff;border-color:#111">公開する</button>
 </header>
 
 <div class="main">
@@ -162,6 +170,18 @@
   });
 })();
 </script>
+<dialog id="dlg">
+  <h2>公開の準備(はじめの1回だけ)</h2>
+  <ol>
+    <li><a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHubのトークン作成ページ</a>を開く</li>
+    <li>Repository access は「Only select repositories」で effect-lab だけを選ぶ</li>
+    <li>Permissions の Repository permissions で「Contents」を「Read and write」にする</li>
+    <li>「Generate token」を押して、出てきた文字をコピーして、下に貼る</li>
+  </ol>
+  <input type="password" id="tok" placeholder="github_pat_..." autocomplete="off" aria-label="トークン">
+  <div id="tokmsg" style="font-size:12px;min-height:1.4em;margin-bottom:8px"></div>
+  <div class="row"><button type="button" id="tokclear">消す</button><button type="button" id="tokcancel">とじる</button><button type="button" id="toksave" style="background:#111;color:#fff;border-color:#111">保存してつなぐ</button></div>
+</dialog>
 <script src="zines-data.js"></script>
 <script src="zine-render.js"></script>
 <script>
@@ -210,7 +230,7 @@ let saveT;
 function persist(){
   clearTimeout(saveT);
   saveT = setTimeout(() => {
-    try { localStorage.setItem(KEY, JSON.stringify({ base: base, zines: DATA })); msg(''); }
+    try { localStorage.setItem(KEY, JSON.stringify({ base: base, zines: DATA })); }
     catch (e) { msg('ブラウザの保存がいっぱいです。「書き出す」で保存してください。'); }
   }, 300);
 }
@@ -482,18 +502,66 @@ function makeZip(files){
   return new Blob([...parts, ...cen, end], { type: 'application/zip' });
 }
 function dataUrlBytes(u){ const b = atob(u.split(',')[1]), a = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) a[i] = b.charCodeAt(i); return a; }
-$('export').onclick = () => {
+function buildFiles(){
   const out = JSON.parse(JSON.stringify(DATA)), files = [];
   out.forEach(z => { let n = 1; [z.cover].concat(z.pages || []).forEach(p => (p.items || []).forEach(it => {
     if (typeof it.src === 'string' && it.src.startsWith('data:')){ const name = 'photos/u-' + z.id + '-' + (n++) + '.jpg'; files.push({ name: name, data: dataUrlBytes(it.src) }); it.src = name; }
   })); });
   const ver = new Date().toISOString().replace(/[:.]/g, '-');
-  const js = '/* このファイルは edit.html の「書き出す」で作りなおされます。手で直してもかまいません。 */\nwindow.ZINES_VERSION = ' + JSON.stringify(ver) + ';\nwindow.ZINES = ' + JSON.stringify(out, null, 1) + ';\n';
+  const js = '/* このファイルは edit.html の「公開する」「zipで保存」で作りなおされます。手で直してもかまいません。 */\nwindow.ZINES_VERSION = ' + JSON.stringify(ver) + ';\nwindow.ZINES = ' + JSON.stringify(out, null, 1) + ';\n';
   files.unshift({ name: 'zines-data.js', data: new TextEncoder().encode(js) });
-  const blob = makeZip(files), a = document.createElement('a');
+  return { files: files, ver: ver };
+}
+$('export').onclick = () => {
+  const r = buildFiles(), blob = makeZip(r.files), a = document.createElement('a');
   a.href = URL.createObjectURL(blob); a.download = 'zine-update.zip'; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-  msg('zine-update.zip を保存しました。解凍して、中身を GitHub にドラッグしてください。');
+  msg('zine-update.zip を保存しました。解凍して、中身をGitHubにドラッグしても公開できます。');
+};
+
+/* ---------- 公開(GitHubに直接) ---------- */
+const GH = { owner: 'mee1215r', repo: 'effect-lab', branch: 'main' };
+const TK = 'zine-gh-token';
+const getTok = () => { try { return localStorage.getItem(TK) || ''; } catch (e) { return ''; } };
+async function api(path, opt){
+  const r = await fetch('https://api.github.com/repos/' + GH.owner + '/' + GH.repo + path, Object.assign({ headers: { 'Authorization': 'Bearer ' + getTok(), 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' } }, opt));
+  if (!r.ok){ const e = new Error('HTTP ' + r.status); e.status = r.status; throw e; }
+  return r.json();
+}
+function b64(u8){ let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); }
+const dlg = $('dlg');
+function openDlg(){ $('tok').value = ''; $('tokmsg').textContent = getTok() ? 'いまは、つながっています(新しく貼ると入れかえます)' : ''; if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', ''); }
+$('gh').onclick = openDlg;
+$('tokcancel').onclick = () => dlg.close();
+$('tokclear').onclick = () => { try { localStorage.removeItem(TK); } catch (e) {} $('tokmsg').textContent = '消しました'; };
+$('toksave').onclick = async () => {
+  const v = $('tok').value.trim(); if (!v){ $('tokmsg').textContent = 'トークンを貼ってください'; return; }
+  try { localStorage.setItem(TK, v); } catch (e) { $('tokmsg').textContent = 'このブラウザでは保存できません'; return; }
+  $('tokmsg').textContent = 'たしかめています…';
+  try { await api(''); await api('/git/ref/heads/' + GH.branch); $('tokmsg').textContent = 'つながりました'; setTimeout(() => dlg.close(), 700); }
+  catch (e) { $('tokmsg').textContent = (e.status === 401 || e.status === 403 || e.status === 404) ? 'つながりませんでした。トークンの権限(Contents: Read and write)と、effect-lab を選んだかを確かめてください' : 'つながりませんでした(' + e.message + ')'; }
+};
+let publishing = false;
+$('publish').onclick = async () => {
+  if (publishing) return;
+  if (!getTok()){ openDlg(); return; }
+  publishing = true; $('publish').disabled = true; msg('公開しています…');
+  try {
+    const r = buildFiles();
+    const ref = await api('/git/ref/heads/' + GH.branch), head = ref.object.sha;
+    const commit = await api('/git/commits/' + head), tree = [];
+    for (const f of r.files){
+      const bl = await api('/git/blobs', { method: 'POST', body: JSON.stringify({ content: b64(f.data), encoding: 'base64' }) });
+      tree.push({ path: f.name, mode: '100644', type: 'blob', sha: bl.sha });
+    }
+    const nt = await api('/git/trees', { method: 'POST', body: JSON.stringify({ base_tree: commit.tree.sha, tree: tree }) });
+    const nc = await api('/git/commits', { method: 'POST', body: JSON.stringify({ message: 'ZINEを更新(編集画面から)', tree: nt.sha, parents: [head] }) });
+    await api('/git/refs/heads/' + GH.branch, { method: 'PATCH', body: JSON.stringify({ sha: nc.sha }) });
+    base = r.ver; persist();
+    msg('公開しました。1〜2分あとに https://mee1215r.github.io/effect-lab/ に出ます。');
+  } catch (e) {
+    msg(e.status === 401 ? 'トークンが使えません。「公開の設定」で貼りなおしてください。' : (e.status === 403 || e.status === 404) ? '公開できませんでした。「公開の設定」で、トークンの権限を確かめてください。' : '公開できませんでした(' + e.message + ')。「zipで保存」でも公開できます。');
+  } finally { publishing = false; $('publish').disabled = false; }
 };
 
 fillSelect(); go(0);
