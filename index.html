@@ -17,7 +17,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --desk:#E8E8E4;
@@ -55,6 +55,7 @@
   .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
   .hint{position:relative;z-index:20;margin:4px 0 0;text-align:center;font-size:.82rem;color:var(--sub)}
   footer{padding:36px 0 40px;text-align:center;font-size:.82rem;color:var(--sub)}
+  footer .ed{margin-left:1.4em;text-decoration:none;opacity:.6}footer .ed:hover{opacity:1;text-decoration:underline}
 
   /* ページ(cqw = ページ幅の1%) */
   .page{background:#111;overflow:hidden}
@@ -73,12 +74,9 @@
   .small.bl{left:5cqw;bottom:4.2cqw}.small.br{right:5cqw;bottom:4.2cqw;text-align:right}
   .small.tl{left:5cqw;top:4.2cqw}.small.tr{right:5cqw;top:4.2cqw;text-align:right}
   .red{background:var(--crayon)}
-  .pg img.stk{position:absolute;inset:auto;height:auto;object-fit:fill;filter:drop-shadow(0 .7cqw 1.1cqw rgba(0,0,0,.28));-webkit-user-drag:none;user-select:none;pointer-events:none}
   .pg.free::before,.pg.free::after{display:none}
   .pg.free.l::after,.pg.free.r::after{display:block}
   .pg.free .word{text-shadow:none}
-  .pg.paper{background-color:#FBF8EE;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 3.6cqw,rgba(110,140,190,.38) 3.6cqw,rgba(110,140,190,.38) 3.75cqw);background-position:0 5cqw}
-  .pg img.stk.pic{border:2.4cqw solid #fff;border-bottom-width:2.4cqw;box-sizing:content-box;filter:drop-shadow(0 .6cqw 1cqw rgba(0,0,0,.3))}
   .lk{display:block;font-family:var(--serif);font-size:7.5cqw;font-weight:400;line-height:1.25;color:#fff;text-decoration:none;border-bottom:.5cqw solid #fff;width:max-content;margin-bottom:5cqw}
   .lk small{display:block;font-family:var(--sans);font-size:2.7cqw;letter-spacing:.06em}
   .links{position:absolute;left:8cqw;top:34cqh}
@@ -98,71 +96,20 @@
   <nav id="picker" aria-label="ZINEを切りかえる"></nav>
 </main>
 
-<footer>© 2026</footer>
+<footer>© 2026 <a href="edit.html" class="ed">編集</a></footer>
 
 <script src="vendor/page-flip.browser.js"></script>
+<script src="zines-data.js"></script>
+<script src="zine-render.js"></script>
 <script>
-/* ============================================================
-   ZINEの中身
-   ZINES に1冊ずつ書き足します(新しいものを上に)。画面の下の日付で切りかえられます。
-     id / label : 識別名 / 画面に出す日付
-     cover      : 表紙の写真・位置・大きな文字 { photo, pos, word, alt }
-     spreads    : 見開きを1組ずつ。左=元の写真、右=加工した写真
-        photo / fx : 写真ファイル     pos : 写真の見せる位置(object-position)
-        wl / wr    : 左右のページの大きな英字。*でくくった部分が斜体の指定です
-     end        : 裏表紙の大きな文字
-   ============================================================ */
-const ZINES = [
-  { id:'2026-11-26', label:'2026.11.26', noEnd:true,
-    cover:{ paper:true, stickers:[
-      { src:'photos/02.jpg', alt:'写真', pic:true, x:12, y:9, w:62, r:-4 },
-      { src:'photos/03.jpg', alt:'写真', pic:true, x:34, y:36, w:52, r:5 },
-      { src:'photos/01.jpg', alt:'写真', pic:true, x:9, y:60, w:46, r:-3 },
-      { src:'dino2.png', alt:'イラスト', x:68, y:6, w:22, r:6 },
-      { src:'cherry.png', alt:'イラスト', x:74, y:64, w:15, r:10 },
-      { src:'cake.png', alt:'イラスト', x:12, y:50, w:11, r:-8 } ] },
-    pages:[
-      { paper:true, stickers:[
-        { src:'photos/04.jpg', alt:'写真', pic:true, x:14, y:8, w:66, r:3 },
-        { src:'photos/05.jpg', alt:'写真', pic:true, x:8, y:40, w:52, r:-4 },
-        { src:'cat.png', alt:'イラスト', x:62, y:54, w:28, r:5 },
-        { src:'cherry.png', alt:'イラスト', x:72, y:82, w:13, r:8 } ] },
-      { paper:true, stickers:[
-        { src:'photos/01.jpg', alt:'写真', pic:true, x:30, y:9, w:58, r:-3 },
-        { src:'photos/03.jpg', alt:'写真', pic:true, x:9, y:36, w:54, r:4 },
-        { src:'dino1.png', alt:'イラスト', x:66, y:62, w:22, r:6 },
-        { src:'dino4.png', alt:'イラスト', x:20, y:72, w:28, r:-5 } ] },
-      { paper:true, stickers:[
-        { src:'photos/02.jpg', alt:'写真', pic:true, x:12, y:10, w:68, r:2 },
-        { src:'photos/05.jpg', alt:'写真', pic:true, x:42, y:42, w:46, r:-5 },
-        { src:'dino3.png', alt:'イラスト', x:8, y:58, w:26, r:5 },
-        { src:'cake.png', alt:'イラスト', x:84, y:84, w:11, r:-8 } ] },
-      { paper:true, stickers:[
-        { src:'photos/04.jpg', alt:'写真', pic:true, x:10, y:9, w:54, r:-3 },
-        { src:'dino2.png', alt:'イラスト', x:62, y:20, w:26, r:5 },
-        { src:'photos/03.jpg', alt:'写真', pic:true, x:26, y:44, w:60, r:3 },
-        { src:'dino1.png', alt:'イラスト', x:8, y:76, w:20, r:-6 } ] }
-    ] },
-  { id:'2026-11-25', label:'2026.11.25', noEnd:true,
-    cover:{ bg:'#F6F6F2', stickers:[
-      { src:'dino1.png', alt:'目の大きな恐竜のイラスト', x:9, y:8, w:26, r:-6 },
-      { src:'dino2.png', alt:'目を閉じた恐竜のイラスト', x:54, y:5, w:34, r:5 },
-      { src:'cat.png', alt:'ねこのイラスト', x:8, y:36, w:40, r:4 },
-      { src:'dino3.png', alt:'恐竜のイラスト', x:56, y:42, w:30, r:-4 },
-      { src:'cherry.png', alt:'さくらんぼのイラスト', x:9, y:75, w:18, r:10 },
-      { src:'dino4.png', alt:'のぞいている恐竜のイラスト', x:40, y:70, w:34, r:-5 },
-      { src:'cake.png', alt:'ケーキのイラスト', x:82, y:80, w:14, r:-8 } ] },
-    pages:[] },
-  { id:'2026-11-24', label:'2026.11.24', end:'*en*d',
-    cover:{ photo:'photos/02.jpg', pos:'58% 50%', word:'*ro*se', alt:'青空を背景に咲く、オレンジ色から赤色のバラ' },
-    spreads:[
-      { photo:'photos/01.jpg', fx:'zine/01_dither.jpg',   pos:'50% 50%', alt:'夕方の空を背景に、白い小さな花が房になって咲く木の枝', altFx:'同じ写真を、2色のドットだけにしたもの', wl:'*du*sk',   wr:'*do*t' },
-      { photo:'photos/02.jpg', fx:'zine/02_halftone.jpg', pos:'58% 50%', alt:'青空を背景に咲く、オレンジ色から赤色のバラ', altFx:'同じ写真を、網点にしたもの', wl:'*or*ange', wr:'*half*tone' },
-      { photo:'photos/03.jpg', fx:'zine/03_glitch.jpg',   pos:'52% 50%', alt:'葉の間に咲く淡いピンクのバラと、隣のつぼみ', altFx:'同じ写真の色を左右にずらして、ノイズを入れたもの', wl:'*pi*nk',   wr:'*sh*ift' },
-      { photo:'photos/04.jpg', fx:'zine/04_gradient.jpg', pos:'60% 50%', alt:'下から見上げた、紫のバラとしおれかけたバラ', altFx:'同じ写真を、グラデーションの色に置き換えたもの', wl:'*vio*let', wr:'*gra*dient' },
-      { photo:'photos/05.jpg', fx:'zine/05_pixel.jpg',    pos:'50% 50%', alt:'青みがかった夕暮れの光の中で咲く白いバラ', altFx:'同じ写真を、大きなモザイクにしたもの', wl:'*whi*te',  wr:'*pi*xel' }
-    ] }
-];
+/* ZINEの中身は zines-data.js にあります(edit.html で作って書き出します)。 */
+try {
+  if (/[?&]preview/.test(location.search)) {
+    const sv = JSON.parse(localStorage.getItem('zine-edit-v1') || 'null');
+    if (sv && sv.zines) window.ZINES = sv.zines;
+  }
+} catch (e) {}
+const ZINES = window.ZINES;
 
 const $ = id => document.getElementById(id);
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -201,12 +148,7 @@ function freePage(d, side, maxSize){
     w.style.fontSize = fit(d.word, maxSize || 40) + 'cqw'; w.style.color = d.ink || '#111'; w.setAttribute('aria-hidden', 'true');
     pg.appendChild(w);
   }
-  (d.stickers || []).forEach(t => {
-    const im = el('img', 'stk' + (t.pic ? ' pic' : '')); im.src = t.src; im.alt = t.alt || ''; im.draggable = false;
-    im.style.left = t.x + '%'; im.style.top = t.y + '%'; im.style.width = t.w + '%';
-    if (t.r) im.style.transform = 'rotate(' + t.r + 'deg)';
-    pg.appendChild(im);
-  });
+  ZR.addItems(pg, d.items || d.stickers || []);
   return pg;
 }
 function wrap(pg, hard){ const p = el('div', 'page'); if (hard) p.dataset.density = 'hard'; p.appendChild(pg); return p; }
@@ -219,6 +161,7 @@ function buildPages(z, book){
     book.appendChild(wrap(photoPage(s.photo, s.alt, s.pos, s.wl, 'l', i % 2 === 1)));
     book.appendChild(wrap(photoPage(s.fx, s.altFx, s.pos, s.wr, 'r', i % 2 === 0)));
   });
+  if (z.pages && z.pages.length % 2) book.appendChild(wrap(freePage({ paper: z.cover.paper, bg: z.cover.bg || '#FBF8EE' }, 'r')));
   if (z.noEnd){
     const q = el('div', 'pg free r' + (z.cover.paper ? ' paper' : '')); if (!z.cover.paper) q.style.background = z.cover.bg || '#F6F6F2';
     book.appendChild(wrap(q, true));
