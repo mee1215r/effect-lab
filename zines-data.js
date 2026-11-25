@@ -1,12 +1,11 @@
-/* このファイルは edit.html の「書き出す」で作りなおされます。手で直してもかまいません。 */
-window.ZINES_VERSION = "2026-11-25-initial";
+/* このファイルは edit.html の「公開する」「zipで保存」で作りなおされます。手で直してもかまいません。 */
+window.ZINES_VERSION = "2026-11-25T06-21-13-334Z";
 window.ZINES = [
  {
   "id": "2026-11-26",
   "label": "2026.11.26",
   "noEnd": true,
   "cover": {
-   "paper": true,
    "items": [
     {
      "src": "photos/02.jpg",
@@ -59,11 +58,11 @@ window.ZINES = [
      "w": 11,
      "r": -8
     }
-   ]
+   ],
+   "bg": "#7c655f"
   },
   "pages": [
    {
-    "paper": true,
     "items": [
      {
       "src": "photos/04.jpg",
@@ -99,7 +98,8 @@ window.ZINES = [
       "w": 13,
       "r": 8
      }
-    ]
+    ],
+    "paper": true
    },
    {
     "paper": true,
@@ -295,7 +295,8 @@ window.ZINES = [
    "photo": "photos/02.jpg",
    "pos": "58% 50%",
    "word": "*ro*se",
-   "alt": "青空を背景に咲く、オレンジ色から赤色のバラ"
+   "alt": "青空を背景に咲く、オレンジ色から赤色のバラ",
+   "items": []
   },
   "spreads": [
    {
