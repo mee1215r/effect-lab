@@ -77,6 +77,8 @@
   .pg.free::before,.pg.free::after{display:none}
   .pg.free.l::after,.pg.free.r::after{display:block}
   .pg.free .word{text-shadow:none}
+  .pg.paper{background-color:#FBF8EE;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 6.3cqw,rgba(110,140,190,.32) 6.3cqw,rgba(110,140,190,.32) 6.5cqw);background-position:0 5cqw}
+  .pg img.stk.pic{border:2.4cqw solid #fff;border-bottom-width:2.4cqw;box-sizing:content-box;filter:drop-shadow(0 .6cqw 1cqw rgba(0,0,0,.3))}
   .lk{display:block;font-family:var(--serif);font-size:7.5cqw;font-weight:400;line-height:1.25;color:#fff;text-decoration:none;border-bottom:.5cqw solid #fff;width:max-content;margin-bottom:5cqw}
   .lk small{display:block;font-family:var(--sans);font-size:2.7cqw;letter-spacing:.06em}
   .links{position:absolute;left:8cqw;top:34cqh}
@@ -111,6 +113,36 @@
      end        : 裏表紙の大きな文字
    ============================================================ */
 const ZINES = [
+  { id:'2026-11-26', label:'2026.11.26', noEnd:true,
+    cover:{ paper:true, stickers:[
+      { src:'photos/02.jpg', alt:'写真', pic:true, x:12, y:9, w:62, r:-4 },
+      { src:'photos/03.jpg', alt:'写真', pic:true, x:34, y:36, w:52, r:5 },
+      { src:'photos/01.jpg', alt:'写真', pic:true, x:9, y:60, w:46, r:-3 },
+      { src:'dino2.png', alt:'イラスト', x:68, y:6, w:22, r:6 },
+      { src:'cherry.png', alt:'イラスト', x:74, y:64, w:15, r:10 },
+      { src:'cake.png', alt:'イラスト', x:12, y:50, w:11, r:-8 } ] },
+    pages:[
+      { paper:true, stickers:[
+        { src:'photos/04.jpg', alt:'写真', pic:true, x:14, y:8, w:66, r:3 },
+        { src:'photos/05.jpg', alt:'写真', pic:true, x:8, y:40, w:52, r:-4 },
+        { src:'cat.png', alt:'イラスト', x:62, y:54, w:28, r:5 },
+        { src:'cherry.png', alt:'イラスト', x:72, y:82, w:13, r:8 } ] },
+      { paper:true, stickers:[
+        { src:'photos/01.jpg', alt:'写真', pic:true, x:30, y:9, w:58, r:-3 },
+        { src:'photos/03.jpg', alt:'写真', pic:true, x:9, y:36, w:54, r:4 },
+        { src:'dino1.png', alt:'イラスト', x:66, y:62, w:22, r:6 },
+        { src:'dino4.png', alt:'イラスト', x:20, y:72, w:28, r:-5 } ] },
+      { paper:true, stickers:[
+        { src:'photos/02.jpg', alt:'写真', pic:true, x:12, y:10, w:68, r:2 },
+        { src:'photos/05.jpg', alt:'写真', pic:true, x:42, y:42, w:46, r:-5 },
+        { src:'dino3.png', alt:'イラスト', x:8, y:58, w:26, r:5 },
+        { src:'cake.png', alt:'イラスト', x:84, y:84, w:11, r:-8 } ] },
+      { paper:true, stickers:[
+        { src:'photos/04.jpg', alt:'写真', pic:true, x:10, y:9, w:54, r:-3 },
+        { src:'dino2.png', alt:'イラスト', x:62, y:20, w:26, r:5 },
+        { src:'photos/03.jpg', alt:'写真', pic:true, x:26, y:44, w:60, r:3 },
+        { src:'dino1.png', alt:'イラスト', x:8, y:76, w:20, r:-6 } ] }
+    ] },
   { id:'2026-11-25', label:'2026.11.25', noEnd:true,
     cover:{ bg:'#F6F6F2', stickers:[
       { src:'dino1.png', alt:'目の大きな恐竜のイラスト', x:9, y:8, w:26, r:-6 },
@@ -162,15 +194,15 @@ function photoPage(src, alt, pos, word, side, placeTop, maxSize){
   return pg;
 }
 function freePage(d, side, maxSize){
-  const pg = el('div', 'pg free ' + (side === 'l' ? 'l' : 'r'));
-  pg.style.background = d.bg || '#fff'; pg.style.color = d.ink || '#111';
+  const pg = el('div', 'pg free ' + (d.paper ? 'paper ' : '') + (side === 'l' ? 'l' : 'r'));
+  if (!d.paper) pg.style.background = d.bg || '#fff'; pg.style.color = d.ink || '#111';
   if (d.word){
     const w = el('div', 'word ' + (d.top === false ? 'bot' : 'up') + (side === 'r' ? ' rt' : ''), '<span class="wt">' + fmt(d.word) + '</span>');
     w.style.fontSize = fit(d.word, maxSize || 40) + 'cqw'; w.style.color = d.ink || '#111'; w.setAttribute('aria-hidden', 'true');
     pg.appendChild(w);
   }
   (d.stickers || []).forEach(t => {
-    const im = el('img', 'stk'); im.src = t.src; im.alt = t.alt || ''; im.draggable = false;
+    const im = el('img', 'stk' + (t.pic ? ' pic' : '')); im.src = t.src; im.alt = t.alt || ''; im.draggable = false;
     im.style.left = t.x + '%'; im.style.top = t.y + '%'; im.style.width = t.w + '%';
     if (t.r) im.style.transform = 'rotate(' + t.r + 'deg)';
     pg.appendChild(im);
@@ -180,7 +212,7 @@ function freePage(d, side, maxSize){
 function wrap(pg, hard){ const p = el('div', 'page'); if (hard) p.dataset.density = 'hard'; p.appendChild(pg); return p; }
 
 function buildPages(z, book){
-  if (z.cover.bg) book.appendChild(wrap(freePage(z.cover, 'r', 46), true));
+  if (z.cover.bg || z.cover.paper) book.appendChild(wrap(freePage(z.cover, 'r', 46), true));
   else book.appendChild(wrap(photoPage(z.cover.photo, z.cover.alt, z.cover.pos, z.cover.word, 'r', false, 46), true));
   if (z.pages) z.pages.forEach((p, i) => book.appendChild(wrap(freePage(p, i % 2 === 0 ? 'l' : 'r'))));
   else z.spreads.forEach((s, i) => {
@@ -188,7 +220,7 @@ function buildPages(z, book){
     book.appendChild(wrap(photoPage(s.fx, s.altFx, s.pos, s.wr, 'r', i % 2 === 0)));
   });
   if (z.noEnd){
-    const q = el('div', 'pg free r'); q.style.background = z.cover.bg || '#F6F6F2';
+    const q = el('div', 'pg free r' + (z.cover.paper ? ' paper' : '')); if (!z.cover.paper) q.style.background = z.cover.bg || '#F6F6F2';
     book.appendChild(wrap(q, true));
     return;
   }
