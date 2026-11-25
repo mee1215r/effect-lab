@@ -72,6 +72,10 @@
   .small.bl{left:5cqw;bottom:4.2cqw}.small.br{right:5cqw;bottom:4.2cqw;text-align:right}
   .small.tl{left:5cqw;top:4.2cqw}.small.tr{right:5cqw;top:4.2cqw;text-align:right}
   .red{background:var(--crayon)}
+  .pg img.stk{position:absolute;inset:auto;height:auto;object-fit:fill;filter:drop-shadow(0 .7cqw 1.1cqw rgba(0,0,0,.28));-webkit-user-drag:none;user-select:none;pointer-events:none}
+  .pg.free::before,.pg.free::after{display:none}
+  .pg.free.l::after,.pg.free.r::after{display:block}
+  .pg.free .word{text-shadow:none}
   .lk{display:block;font-family:var(--serif);font-size:7.5cqw;font-weight:400;line-height:1.25;color:#fff;text-decoration:none;border-bottom:.5cqw solid #fff;width:max-content;margin-bottom:5cqw}
   .lk small{display:block;font-family:var(--sans);font-size:2.7cqw;letter-spacing:.06em}
   .links{position:absolute;left:8cqw;top:34cqh}
@@ -106,6 +110,16 @@
      end        : 裏表紙の大きな文字
    ============================================================ */
 const ZINES = [
+  { id:'2026-11-25', label:'2026.11.25', noEnd:true,
+    cover:{ bg:'#F6F6F2', stickers:[
+      { src:'stickers/dino1.png', alt:'目の大きな恐竜のイラスト', x:4, y:5, w:38, r:-6 },
+      { src:'stickers/dino2.png', alt:'目を閉じた恐竜のイラスト', x:52, y:4, w:34, r:5 },
+      { src:'stickers/cat.png', alt:'ねこのイラスト', x:6, y:34, w:42, r:4 },
+      { src:'stickers/dino3.png', alt:'恐竜のイラスト', x:54, y:36, w:32, r:-4 },
+      { src:'stickers/dino4.png', alt:'のぞいている恐竜のイラスト', x:32, y:66, w:36, r:-5 },
+      { src:'stickers/cherry.png', alt:'さくらんぼのイラスト', x:7, y:73, w:18, r:10 },
+      { src:'stickers/cake.png', alt:'ケーキのイラスト', x:78, y:74, w:14, r:-8 } ] },
+    pages:[] },
   { id:'2026-11-24', label:'2026.11.24', end:'*en*d',
     cover:{ photo:'photos/02.jpg', pos:'58% 50%', word:'*ro*se', alt:'青空を背景に咲く、オレンジ色から赤色のバラ' },
     spreads:[
@@ -146,15 +160,37 @@ function photoPage(src, alt, pos, word, side, placeTop, maxSize){
   pg.appendChild(w);
   return pg;
 }
+function freePage(d, side, maxSize){
+  const pg = el('div', 'pg free ' + (side === 'l' ? 'l' : 'r'));
+  pg.style.background = d.bg || '#fff'; pg.style.color = d.ink || '#111';
+  if (d.word){
+    const w = el('div', 'word ' + (d.top === false ? 'bot' : 'up') + (side === 'r' ? ' rt' : ''), '<span class="wt">' + fmt(d.word) + '</span>');
+    w.style.fontSize = fit(d.word, maxSize || 40) + 'cqw'; w.style.color = d.ink || '#111'; w.setAttribute('aria-hidden', 'true');
+    pg.appendChild(w);
+  }
+  (d.stickers || []).forEach(t => {
+    const im = el('img', 'stk'); im.src = t.src; im.alt = t.alt || ''; im.draggable = false;
+    im.style.left = t.x + '%'; im.style.top = t.y + '%'; im.style.width = t.w + '%';
+    if (t.r) im.style.transform = 'rotate(' + t.r + 'deg)';
+    pg.appendChild(im);
+  });
+  return pg;
+}
 function wrap(pg, hard){ const p = el('div', 'page'); if (hard) p.dataset.density = 'hard'; p.appendChild(pg); return p; }
 
 function buildPages(z, book){
-  const c = photoPage(z.cover.photo, z.cover.alt, z.cover.pos, z.cover.word, 'r', false, 46);
-  book.appendChild(wrap(c, true));
-  z.spreads.forEach((s, i) => {
+  if (z.cover.bg) book.appendChild(wrap(freePage(z.cover, 'r', 46), true));
+  else book.appendChild(wrap(photoPage(z.cover.photo, z.cover.alt, z.cover.pos, z.cover.word, 'r', false, 46), true));
+  if (z.pages) z.pages.forEach((p, i) => book.appendChild(wrap(freePage(p, i % 2 === 0 ? 'l' : 'r'))));
+  else z.spreads.forEach((s, i) => {
     book.appendChild(wrap(photoPage(s.photo, s.alt, s.pos, s.wl, 'l', i % 2 === 1)));
     book.appendChild(wrap(photoPage(s.fx, s.altFx, s.pos, s.wr, 'r', i % 2 === 0)));
   });
+  if (z.noEnd){
+    const q = el('div', 'pg free r'); q.style.background = z.cover.bg || '#F6F6F2';
+    book.appendChild(wrap(q, true));
+    return;
+  }
   const pg = el('div', 'pg red');
   const w = el('div', 'word up', '<span class="wt">' + fmt(z.end || '*en*d') + '</span>'); w.style.fontSize = '40cqw'; w.setAttribute('aria-hidden', 'true');
   pg.appendChild(w);
