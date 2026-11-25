@@ -9,7 +9,7 @@
     '.pg .txt{position:absolute;margin:0;font-family:"Klee One","Zen Kaku Gothic New","Hiragino Maru Gothic ProN",sans-serif;font-weight:600;line-height:1.35;white-space:pre;pointer-events:none;user-select:none}',
     '.pg .tape{position:absolute;margin:0;opacity:.88;pointer-events:none;clip-path:polygon(0 8%,2% 0,4% 8%,6% 0,8% 8%,10% 0,100% 0,100% 100%,10% 100%,8% 92%,6% 100%,4% 92%,2% 100%,0 92%);mix-blend-mode:multiply;box-shadow:0 .3cqw .6cqw rgba(0,0,0,.18)}',
     '.pg svg.pen{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible}',
-    '.pg.paper{background-color:#FBF8EE;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 3.6cqw,rgba(110,140,190,.38) 3.6cqw,rgba(110,140,190,.38) 3.75cqw);background-position:0 5cqw}'
+    '.pg.paper{background-color:#FBF8EE;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--lp,4.17%) - .15%),rgba(110,140,190,.42) calc(var(--lp,4.17%) - .15%),rgba(110,140,190,.42) var(--lp,4.17%))}'
   ].join('\n');
   document.head.appendChild(css);
 
@@ -71,5 +71,6 @@
     (items || []).forEach(function(t, i){ var n = item(t, hit); n.dataset.i = i; pg.appendChild(n); out.push(n); });
     return out;
   }
-  window.ZR = { item: item, addItems: addItems };
+  function lines(el, d){ el.style.setProperty('--lp', (100 / ((d && d.lines) || 24)).toFixed(3) + '%'); }
+  window.ZR = { item: item, addItems: addItems, lines: lines };
 })();

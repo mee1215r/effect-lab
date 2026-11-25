@@ -142,7 +142,7 @@ function photoPage(src, alt, pos, word, side, placeTop, maxSize){
 }
 function freePage(d, side, maxSize){
   const pg = el('div', 'pg free ' + (d.paper ? 'paper ' : '') + (side === 'l' ? 'l' : 'r'));
-  if (!d.paper) pg.style.background = d.bg || '#fff'; pg.style.color = d.ink || '#111';
+  if (!d.paper) pg.style.background = d.bg || '#fff'; else ZR.lines(pg, d); pg.style.color = d.ink || '#111';
   if (d.word){
     const w = el('div', 'word ' + (d.top === false ? 'bot' : 'up') + (side === 'r' ? ' rt' : ''), '<span class="wt">' + fmt(d.word) + '</span>');
     w.style.fontSize = fit(d.word, maxSize || 40) + 'cqw'; w.style.color = d.ink || '#111'; w.setAttribute('aria-hidden', 'true');
@@ -161,9 +161,9 @@ function buildPages(z, book){
     book.appendChild(wrap(photoPage(s.photo, s.alt, s.pos, s.wl, 'l', i % 2 === 1)));
     book.appendChild(wrap(photoPage(s.fx, s.altFx, s.pos, s.wr, 'r', i % 2 === 0)));
   });
-  if (z.pages && z.pages.length % 2) book.appendChild(wrap(freePage({ paper: z.cover.paper, bg: z.cover.bg || '#FBF8EE' }, 'r')));
+  if (z.pages && z.pages.length % 2) book.appendChild(wrap(freePage({ paper: z.cover.paper, lines: z.cover.lines, bg: z.cover.bg || '#FBF8EE' }, 'r')));
   if (z.noEnd){
-    const q = el('div', 'pg free r' + (z.cover.paper ? ' paper' : '')); if (!z.cover.paper) q.style.background = z.cover.bg || '#F6F6F2';
+    const q = el('div', 'pg free r' + (z.cover.paper ? ' paper' : '')); if (!z.cover.paper) q.style.background = z.cover.bg || '#F6F6F2'; else ZR.lines(q, z.cover);
     book.appendChild(wrap(q, true));
     return;
   }
