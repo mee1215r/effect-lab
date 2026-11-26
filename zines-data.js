@@ -1,5 +1,5 @@
 /* このファイルは edit.html の「公開する」「zipで保存」で作りなおされます。手で直してもかまいません。 */
-window.ZINES_VERSION = "2026-11-26T14-30-41-725Z";
+window.ZINES_VERSION = "2026-11-26T14-37-21-953Z";
 window.ZINES = [
  {
   "id": "2026-11-26",
@@ -16,6 +16,16 @@ window.ZINES = [
      "r": 6
     },
     {
+     "shape": "graph",
+     "alt": "方眼紙",
+     "x": -19.51,
+     "y": -5.25,
+     "w": 142.58,
+     "r": -0.17,
+     "c": "#2a2a2a",
+     "o": 0.12
+    },
+    {
      "tape": true,
      "c": "#F2A65A",
      "pat": "dot",
@@ -25,7 +35,7 @@ window.ZINES = [
      "r": 0
     },
     {
-     "src": "photos/u-mwxngraz1.jpg",
+     "src": "photos/u-mwxnpc4e1.jpg",
      "alt": "写真",
      "x": 3.04,
      "y": 14.29,
@@ -42,7 +52,7 @@ window.ZINES = [
      "r": 0
     },
     {
-     "src": "photos/u-mwxngrb02.jpg",
+     "src": "photos/u-mwxnpc4g2.jpg",
      "alt": "写真",
      "x": 34.07,
      "y": 56.29,
