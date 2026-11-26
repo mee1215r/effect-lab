@@ -7,65 +7,115 @@
 <title>ZINEを作る</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Yomogi&family=Shippori+Mincho:wght@500;700&family=Dela+Gothic+One&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Yomogi&family=Shippori+Mincho:wght@500;700&family=Dela+Gothic+One&family=Cormorant+Garamond:ital,wght@1,500&display=swap" rel="stylesheet">
 <style>
-  :root{--desk:#E8E8E4;--ink:#111;--sub:#55554f;--line:#cfcfc8;--sans:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",system-ui,sans-serif}
+  :root{--desk:#E8E8E4;--ink:#111;--sub:#55554f;--line:#cfcfc8;--acc:#1a73e8;--panel:#f6f6f2;--sans:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",system-ui,sans-serif}
   *{box-sizing:border-box}
   html,body{height:100%}
-  body{margin:0;background:var(--desk);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;display:flex;flex-direction:column}
+  body{margin:0;background:var(--desk);color:var(--ink);font-family:var(--sans);font-size:13px;line-height:1.5;display:flex;flex-direction:column;overflow:hidden}
   button,select,input,textarea{font:inherit;color:inherit}
-  button{cursor:pointer;background:#fff;border:1px solid var(--line);border-radius:6px;padding:6px 10px}
+  button{cursor:pointer;background:#fff;border:1px solid var(--line);border-radius:6px;padding:5px 9px}
   button:hover{border-color:var(--ink)}
   button[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
   button:disabled{opacity:.35;cursor:default}
-  :focus-visible{outline:3px solid var(--ink);outline-offset:2px}
-  .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);background:#f6f6f2}
+  :focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+  .hide{display:none!important}
+  .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--panel)}
   .bar .sp{flex:1}
-  .bar select,.bar input{border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:#fff}
+  .bar select,.bar input{border:1px solid var(--line);border-radius:6px;padding:5px 8px;background:#fff}
   .bar input{width:9.5em}
   .main{flex:1;min-height:0;display:flex}
-  #strip{width:236px;flex:none;overflow-y:scroll;padding:12px 10px;border-right:1px solid var(--line);background:#f6f6f2;display:grid;grid-template-columns:1fr 1fr;gap:10px;align-content:start;grid-auto-rows:max-content;scrollbar-width:auto}
-  #strip::-webkit-scrollbar{width:12px}#strip::-webkit-scrollbar-thumb{background:#b9b9b2;border-radius:6px;border:2px solid #f6f6f2}
-  .th{position:relative;width:100%;height:auto;aspect-ratio:3/4;min-height:0;border:2px solid transparent;border-radius:3px;overflow:hidden;cursor:pointer;flex:none;box-shadow:0 0 0 1px var(--line)}
-  .th.on{border-color:var(--ink)}
+
+  /* ページ一覧 */
+  #strip{width:200px;flex:none;overflow-y:scroll;padding:10px 8px;border-right:1px solid var(--line);background:var(--panel);display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:start;grid-auto-rows:max-content}
+  #strip::-webkit-scrollbar{width:12px}#strip::-webkit-scrollbar-thumb{background:#b9b9b2;border-radius:6px;border:2px solid var(--panel)}
+  .th{position:relative;width:100%;aspect-ratio:3/4;border:2px solid transparent;border-radius:3px;overflow:hidden;cursor:pointer;box-shadow:0 0 0 1px var(--line)}
+  .th.on{border-color:var(--acc)}
   .th .pg{pointer-events:none}
   .th small{position:absolute;left:3px;bottom:2px;background:#fff;border-radius:3px;padding:0 4px;font-size:11px;z-index:5}
-  .pgbtn{display:grid;grid-template-columns:1fr 1fr;gap:6px;grid-column:1/-1;grid-row:1;position:sticky;top:-12px;z-index:6;background:#f6f6f2;padding:12px 0 8px;margin-top:-12px}
-  .pgbtn button{padding:5px 4px;font-size:12px}
-  #center{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;padding:18px;overflow:auto}
-  #wrap{position:relative;height:min(100%,calc(100vh - 110px));aspect-ratio:3/4;flex:none;box-shadow:0 8px 30px rgba(0,0,0,.18);touch-action:none}
+  .pgbtn{display:grid;grid-template-columns:1fr 1fr;gap:5px;grid-column:1/-1;grid-row:1;position:sticky;top:-10px;z-index:6;background:var(--panel);padding:10px 0 6px;margin-top:-10px}
+  .pgbtn button{padding:4px;font-size:12px}
+
+  /* 道具 */
+  #toolbar{width:56px;flex:none;display:flex;flex-direction:column;gap:6px;padding:10px 6px;border-right:1px solid var(--line);background:var(--panel);align-items:stretch}
+  #toolbar button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 2px;font-size:11px;line-height:1.2}
+  #toolbar svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+  /* 中央 */
+  #stage{flex:1;min-width:0;display:flex;flex-direction:column;position:relative}
+  #ctx{display:flex;flex-wrap:nowrap;gap:6px 12px;align-items:center;height:46px;flex:none;overflow-x:auto;overflow-y:hidden;white-space:nowrap;padding:0 12px;border-bottom:1px solid var(--line);background:#fbfbf8;font-size:12px}
+  #ctx .g{display:flex;align-items:center;gap:5px;flex:none}
+  #ctx .g+.g{padding-left:12px;border-left:1px solid var(--line)}
+  #ctx label{display:flex;align-items:center;gap:5px;color:var(--sub)}
+  #ctx input[type=range]{width:70px;min-width:0;flex:none}
+  #ctx input[type=number]{width:58px;border:1px solid var(--line);border-radius:6px;padding:3px 5px;background:#fff}
+  #ctx button{padding:3px 7px;font-size:12px}
+  #ctx .ic{width:28px;height:26px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+  #ctx .ic svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  #ctxHint{color:var(--sub)}
+  #center{flex:1;min-height:0;display:flex;overflow:auto;padding:18px;background:var(--desk)}
+  #center.pan{cursor:grab}
+  #wrap{position:relative;margin:auto;flex:none;aspect-ratio:3/4;box-shadow:0 8px 30px rgba(0,0,0,.18);touch-action:none}
   #page{position:absolute;inset:0;overflow:hidden;container-type:size;isolation:isolate;user-select:none}
   #page .stk,#page .txt,#page .tape{pointer-events:auto;cursor:move}
+  #page [data-lk]{pointer-events:none!important}
+  #page svg.pen path.hit{pointer-events:stroke;cursor:move}
   #page.pen{cursor:crosshair}
-  #page.pen .stk,#page.pen .txt,#page.pen .tape{pointer-events:none}
-  #page.erase svg.pen path.hit{pointer-events:stroke;cursor:pointer}
-  #page.erase .stk,#page.erase .txt,#page.erase .tape{pointer-events:none}
-  #sel{position:absolute;border:1.5px dashed #1a73e8;pointer-events:none;display:none}
-  #sel i{position:absolute;width:14px;height:14px;background:#fff;border:2px solid #1a73e8;border-radius:50%;pointer-events:auto}
-  #sel i.sz{width:16px;height:16px}
-  #sel i.nw{left:-9px;top:-9px;cursor:nwse-resize}#sel i.ne{right:-9px;top:-9px;cursor:nesw-resize}
-  #sel i.sw{left:-9px;bottom:-9px;cursor:nesw-resize}#sel i.se{right:-9px;bottom:-9px;cursor:nwse-resize}
-  .stkpal .shp{position:static;width:64%;filter:none;pointer-events:none}
-  .sub{font-size:12px;font-weight:500;margin-top:2px}
-  #selgrp{order:-1;padding-bottom:12px;border-bottom:1px solid var(--line)}
-  .sl{display:flex;align-items:center;gap:8px;flex:1;font-size:12px}.sl input{flex:1;min-width:0}
-  #guideV,#guideH{position:absolute;pointer-events:none;background:#ff2d78;display:none;z-index:9}
-  #guideV{left:50%;top:0;bottom:0;width:1px}#guideH{top:50%;left:0;right:0;height:1px}
-  #sel i.rot{left:50%;top:-30px;margin-left:-7px;cursor:grab;border-radius:3px}
-  #sel::after{content:"";position:absolute;left:50%;top:-18px;height:18px;border-left:1.5px dashed #1a73e8}
-  #tools{width:262px;flex:none;overflow:auto;padding:12px 14px;border-left:1px solid var(--line);background:#f6f6f2;display:flex;flex-direction:column;gap:14px}
-  .grp{display:flex;flex-direction:column;gap:8px}
-  .grp>b{font-weight:700;font-size:13px}
+  #page.pen .stk,#page.pen .txt,#page.pen .tape,#page.pen svg.pen path.hit,#page.erase .stk,#page.erase .txt,#page.erase .tape{pointer-events:none}
+  #page.erase svg.pen path.hit{cursor:pointer}
+  #sel{position:absolute;border:1.5px solid var(--acc);pointer-events:none;display:none;z-index:20}
+  #sel i{position:absolute;width:11px;height:11px;background:#fff;border:1.5px solid var(--acc);pointer-events:auto}
+  #sel i.nw{left:-6px;top:-6px;cursor:nwse-resize}#sel i.ne{right:-6px;top:-6px;cursor:nesw-resize}
+  #sel i.sw{left:-6px;bottom:-6px;cursor:nesw-resize}#sel i.se{right:-6px;bottom:-6px;cursor:nwse-resize}
+  #sel i.rot{left:50%;top:-28px;margin-left:-6px;cursor:grab;border-radius:50%}
+  #sel::after{content:"";position:absolute;left:50%;top:-18px;height:18px;border-left:1.5px solid var(--acc)}
+  #sel.multi i.rot,#sel.multi::after,#sel.norot i.rot,#sel.norot::after{display:none}
+  #marq{position:absolute;border:1px solid var(--acc);background:rgba(26,115,232,.1);display:none;z-index:21;pointer-events:none}
+  .gd{position:absolute;pointer-events:none;background:#ff2d78;z-index:22}
+  #zoom{position:absolute;right:14px;bottom:12px;display:flex;gap:4px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:8px;padding:3px;z-index:30;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+  #zoom button{border:0;padding:3px 8px;background:transparent}
+  #zoom output{min-width:3.4em;text-align:center;font-size:12px}
+
+  /* 右 */
+  #side{width:304px;flex:none;display:flex;flex-direction:column;border-left:1px solid var(--line);background:var(--panel);min-height:0}
+  #props{padding:10px 12px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px;max-height:46%;overflow:auto;background:#fff}
+  #props b{font-size:12px}
+  .tabs{display:flex;border-bottom:1px solid var(--line)}
+  .tabs button{flex:1;border:0;border-radius:0;background:transparent;padding:9px 4px;border-bottom:2px solid transparent;margin-bottom:-1px}
+  .tabs button[aria-pressed=true]{background:transparent;color:var(--ink);border-bottom-color:var(--ink);font-weight:700}
+  .pane{flex:1;min-height:0;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+  .chips{display:flex;flex-wrap:wrap;gap:5px}
+  .chips button{padding:3px 9px;border-radius:999px;font-size:12px}
   .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .sub{font-size:12px;color:var(--sub)}
   .stkpal{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
-  .stkpal button{min-width:0;padding:3px;aspect-ratio:1;display:flex;align-items:center;justify-content:center}
+  .stkpal button{min-width:0;padding:3px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .stkpal button.wide{grid-column:span 2;aspect-ratio:2/1}
   .stkpal img{max-width:100%;max-height:100%;object-fit:contain}
-  .sw{width:26px;height:26px;padding:0;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
-  .sw[aria-pressed=true]{box-shadow:0 0 0 2px var(--ink);background-clip:padding-box}
-  input[type=color]{width:34px;height:30px;padding:0;border:1px solid var(--line);border-radius:6px;background:#fff}
-  input[type=range]{flex:1;min-width:90px}
-  textarea{width:100%;min-height:70px;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-family:"Klee One","Zen Kaku Gothic New",sans-serif;resize:vertical}
-  .hide{display:none!important}
+  .stkpal .shp{position:static;width:78%;filter:none;pointer-events:none;max-height:100%}
+  .stkpal .shp svg{max-height:100%}
+  .stkpal .tp{width:84%;height:30%;border-radius:2px;opacity:.95}
+  .sw{width:24px;height:24px;padding:0;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
+  .sw[aria-pressed=true]{box-shadow:0 0 0 2px var(--ink)}
+  .sw.auto{background:conic-gradient(#F4A6B8,#F1D56A,#A9D4A0,#8FB8E8,#C9B3E6,#F4A6B8)}
+  input[type=color]{width:32px;height:28px;padding:0;border:1px solid var(--line);border-radius:6px;background:#fff}
+  input[type=range]{flex:1;min-width:70px}
+  textarea{width:100%;min-height:62px;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-family:"Klee One","Zen Kaku Gothic New",sans-serif;resize:vertical}
+  .sl{display:flex;align-items:center;gap:8px;flex:1;font-size:12px}.sl input{flex:1;min-width:0}
+  /* レイヤー */
+  #layers{display:flex;flex-direction:column;gap:3px}
+  .ly{display:flex;align-items:center;gap:6px;padding:3px 6px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;min-height:34px}
+  .ly.on{border-color:var(--acc);background:#eaf2fe}
+  .ly.over{box-shadow:0 -2px 0 var(--acc)}
+  .ly .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ly .tn{width:26px;height:26px;flex:none;border-radius:3px;background:#eee;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:11px}
+  .ly .tn img{width:100%;height:100%;object-fit:contain}
+  .ly .tn .shp{position:static;width:80%;filter:none}
+  .ly button{border:0;background:transparent;padding:2px 4px;font-size:12px;opacity:.55}
+  .ly button[aria-pressed=true]{opacity:1;background:transparent;color:var(--ink)}
+  .ly.hid .nm{opacity:.4}
+  #msg{padding:6px 12px;font-size:12px;color:var(--sub);min-height:2.4em;border-top:1px solid var(--line)}
+
   #gate{position:fixed;inset:0;z-index:99;background:var(--desk);display:flex;align-items:center;justify-content:center}
   #gate form{display:flex;gap:8px;align-items:center}
   #gate input{border:1px solid var(--line);border-radius:6px;padding:8px 10px;background:#fff;width:14em}
@@ -73,11 +123,9 @@
   dialog{border:0;border-radius:10px;padding:20px 22px;max-width:460px;width:calc(100% - 32px);box-shadow:0 10px 40px rgba(0,0,0,.3)}
   dialog::backdrop{background:rgba(0,0,0,.35)}
   dialog h2{margin:0 0 8px;font-size:16px}
-  dialog ol{margin:8px 0 12px;padding-left:1.3em;font-size:13px;line-height:1.7}
-  dialog input[type=password]{width:100%;border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin-bottom:10px}
-  dialog .row{justify-content:flex-end}
-  #msg{font-size:12px;color:var(--sub);min-height:1.4em}
-  @media (max-width:900px){.main{flex-direction:column}#strip{width:auto;display:flex;flex-direction:row;border-right:0;border-bottom:1px solid var(--line)}.th{width:70px}#tools{width:auto;border-left:0;border-top:1px solid var(--line)}}
+  dialog ol{padding-left:1.3em;margin:0 0 12px}
+  dialog input[type=password]{width:100%;border:1px solid var(--line);border-radius:6px;padding:8px;margin-bottom:6px}
+  @media (max-width:900px){#side{width:240px}#strip{width:150px}}
 </style>
 </head>
 <body>
@@ -90,7 +138,7 @@
   <label>日付 <input id="zlabel" type="text" aria-label="ZINEの日付"></label>
   <button type="button" id="znew">新しいZINE</button>
   <span class="sp"></span>
-  <button type="button" id="undo">ひとつ戻す</button>
+  <button type="button" id="undo" title="Ctrl+Z">ひとつ戻す</button>
   <button type="button" id="preview">見た目を確認</button>
   <button type="button" id="reset">最初の状態に戻す</button>
   <button type="button" id="export">zipで保存</button>
@@ -100,87 +148,51 @@
 
 <div class="main">
   <aside id="strip" aria-label="ページ"></aside>
-  <section id="center">
-    <div id="wrap">
-      <div id="page" class="pg free"></div>
-      <div id="sel"><i class="rot" title="回す"></i><i class="sz nw" title="大きさ"></i><i class="sz ne" title="大きさ"></i><i class="sz sw" title="大きさ"></i><i class="sz se" title="大きさ"></i></div>
-      <div id="guideV"></div><div id="guideH"></div>
+  <nav id="toolbar" aria-label="道具">
+    <button type="button" data-mode="select" aria-pressed="true" title="選ぶ・動かす (V)"><svg viewBox="0 0 24 24"><path d="M5 3l14 8-6 2-3 6z"/></svg>選ぶ</button>
+    <button type="button" data-mode="pen" aria-pressed="false" title="ペン (P)"><svg viewBox="0 0 24 24"><path d="M4 20l1-5L16 4l4 4L9 19z"/><path d="M14 6l4 4"/></svg>ペン</button>
+    <button type="button" data-mode="erase" aria-pressed="false" title="線を消す (E)"><svg viewBox="0 0 24 24"><path d="M8 20h12M6 15l8-9 5 5-6 7H8z"/></svg>消す</button>
+  </nav>
+  <section id="stage">
+    <div id="ctx" aria-label="選んだものの操作"></div>
+    <div id="center">
+      <div id="wrap">
+        <div id="page" class="pg free"></div>
+        <div id="sel"><i class="rot" title="回す"></i><i class="sz nw"></i><i class="sz ne"></i><i class="sz sw"></i><i class="sz se"></i></div>
+        <div id="marq"></div>
+      </div>
     </div>
+    <div id="zoom"><button type="button" id="zout" title="縮小 (-)">−</button><output id="zv">100%</output><button type="button" id="zin" title="拡大 (+)">＋</button><button type="button" id="zfit" title="全体を見る (0)">全体</button></div>
   </section>
-  <aside id="tools">
-    <div class="grp">
-      <b>はる</b>
+  <aside id="side">
+    <div id="props" class="hide"></div>
+    <div class="tabs" role="tablist">
+      <button type="button" data-tab="mat" aria-pressed="true">素材</button>
+      <button type="button" data-tab="page" aria-pressed="false">紙</button>
+      <button type="button" data-tab="lay" aria-pressed="false">重なり</button>
+    </div>
+    <div class="pane" id="pane-mat">
       <div class="row">
-        <button type="button" id="addPhoto">写真</button>
-        <button type="button" id="addText">文字</button>
-        <button type="button" id="addTape">マステ</button>
-        <button type="button" id="addImg" title="自分の絵(透明PNG)をステッカーとして貼る">絵を入れる</button>
+        <button type="button" id="addPhoto">写真を入れる</button>
+        <button type="button" id="addImg" title="自分の絵(透明PNG)をステッカーにする">絵を入れる</button>
         <input type="file" id="file" accept="image/*" multiple class="hide">
-        <input type="file" id="fileStk" accept="image/png,image/webp,image/svg+xml,image/*" multiple class="hide">
+        <input type="file" id="fileStk" accept="image/*" multiple class="hide">
       </div>
-      <div class="sub">ステッカー</div>
-      <div class="stkpal" id="stkpal"></div>
-      <div class="sub">かたち(色は貼ってから変えられます)</div>
-      <div class="stkpal" id="shppal"></div>
+      <div class="chips" id="matTabs"></div>
+      <div class="row" id="matColorRow"><span class="sub">色</span><span class="row" id="matColors"></span></div>
+      <div id="matBody"></div>
     </div>
-
-    <div class="grp">
-      <b>道具</b>
-      <div class="row">
-        <button type="button" data-mode="select" aria-pressed="true">選ぶ</button>
-        <button type="button" data-mode="pen" aria-pressed="false">ペン</button>
-        <button type="button" data-mode="erase" aria-pressed="false">線を消す</button>
-      </div>
-      <div class="row" id="penrow">
-        <span id="penSw" class="row"></span>
-        <input type="color" id="penColor" value="#2a2a2a" aria-label="ペンの色">
-        <input type="range" id="penW" min="3" max="30" value="8" aria-label="ペンの太さ">
-      </div>
-    </div>
-
-    <div class="grp" id="selgrp">
-      <b>選んだもの</b>
-      <div id="txtgrp" class="grp hide">
-        <textarea id="txtIn" aria-label="文字"></textarea>
-        <div class="row" id="fontRow"></div>
-        <div class="row"><input type="range" id="txtSize" min="2" max="22" step=".5" aria-label="文字の大きさ"><input type="color" id="txtColor" aria-label="文字の色"></div>
-      </div>
-      <div id="shapegrp" class="grp hide">
-        <div class="row" id="shapeSw"></div>
-        <div class="row"><input type="color" id="shapeColor" aria-label="かたちの色"><button type="button" id="shapeSk">ふち</button></div>
-      </div>
-      <div id="tapegrp" class="grp hide">
-        <div class="row" id="tapeSw"></div>
-        <div class="row"><button type="button" data-pat="stripe">しま</button><button type="button" data-pat="dot">水玉</button><button type="button" data-pat="plain">無地</button><button type="button" data-pat="check">チェック</button><button type="button" data-pat="vstripe">たて線</button></div>
-      </div>
-      <div class="row" id="sizeRow"><label class="sl">大きさ <input type="range" id="sizeR" min="3" max="120" step=".5" aria-label="大きさ"></label></div>
-      <div class="row"><label class="sl">うすさ <input type="range" id="opaR" min="10" max="100" aria-label="透明度"></label></div>
-      <div class="row">
-        <button type="button" id="flip" class="hide">左右反転</button>
-        <button type="button" id="cenH">左右の中央</button>
-        <button type="button" id="cenV">上下の中央</button>
-      </div>
-      <div class="row">
-        <button type="button" id="border" class="hide">白いふち</button>
-        <button type="button" id="front">前へ</button>
-        <button type="button" id="back">うしろへ</button>
-        <button type="button" id="dup">コピー</button>
-        <button type="button" id="del">消す</button>
-      </div>
-    </div>
-
-    <div class="grp">
-      <b>このページの紙</b>
+    <div class="pane hide" id="pane-page">
       <div class="row">
         <button type="button" data-paper="lined">罫線あり</button>
         <button type="button" data-paper="plain">無地</button>
       </div>
       <div class="row" id="bgSw"></div>
       <div class="row" id="linesRow">
-        <label style="display:flex;align-items:center;gap:8px;flex:1">線の数 <input type="range" id="lines" min="8" max="60" value="24" aria-label="罫線の数"> <output id="linesV" style="min-width:2em;text-align:right"></output></label>
+        <label class="sl">線の数 <input type="range" id="lines" min="8" max="60" value="24" aria-label="罫線の数"> <output id="linesV" style="min-width:2em;text-align:right"></output></label>
         <button type="button" id="linesAll">全ページに</button>
       </div>
-      <b style="font-size:12px;font-weight:500">質感</b>
+      <span class="sub">質感</span>
       <div class="row">
         <button type="button" data-tex="none">なし</button>
         <button type="button" data-tex="grain">ざらざら</button>
@@ -189,14 +201,17 @@
         <button type="button" data-tex="crumple">しわ</button>
       </div>
       <div class="row" id="texRow">
-        <label style="display:flex;align-items:center;gap:8px;flex:1">濃さ <input type="range" id="texA" min="10" max="100" value="70" aria-label="質感の濃さ"></label>
+        <label class="sl">濃さ <input type="range" id="texA" min="10" max="100" value="70" aria-label="質感の濃さ"></label>
         <button type="button" id="texAll">全ページに</button>
       </div>
+    </div>
+    <div class="pane hide" id="pane-lay">
+      <span class="sub">上にあるものほど手前です。ドラッグで並べかえ。</span>
+      <div id="layers"></div>
     </div>
     <div id="msg" role="status"></div>
   </aside>
 </div>
-
 <script>
 (function(){
   var G = document.getElementById('gate'), OK = 'ed1c9fd820dccce0c009eb03eb0ca95519d8325482de17326e23a1f228c39884';
@@ -232,30 +247,37 @@ const PH = 133.333;
 const KEY = 'zine-edit-v1';
 const STICKERS = ['dino1','dino2','dino3','dino4','cat','cherry','cake'].map(n => n + '.png');
 const TAPE_COLORS = ['#F4A6B8','#F1D56A','#8FB8E8','#A9D4A0','#F2A65A','#C9B3E6'];
+const MAT_COLORS = ['#F4A6B8','#F1D56A','#8FB8E8','#A9D4A0','#F2A65A','#C9B3E6','#FFFFFF','#2a2a2a','#D8322A','#7c655f'];
 const PEN_COLORS = ['#2a2a2a','#D8322A','#2f6fd0','#2e8b57','#e0a800'];
-const KRAFT = '#D9B98C', PLAIN = '#FBF8EE';
+const TAPE_PATS = [['stripe','しま'],['dot','水玉'],['plain','無地'],['check','チェック'],['vstripe','たて線'],['gingham','ギンガム'],['lines','よこ線'],['dot2','大きい水玉'],['zig','ジグザグ']];
+const FONT_OPTS = [['','手書き'],['yomogi','やわらかい'],['gothic','ゴシック'],['mincho','明朝'],['dela','太字'],['cor','英字']];
+const HL_COLORS = ['#FFE66D','#F9C2D0','#BFE0F5','#CFE8C2'];
+const PLAIN = '#FBF8EE';
 const $ = id => document.getElementById(id);
 const q = (s, r) => (r || document).querySelector(s);
+const qa = (s, r) => Array.from((r || document).querySelectorAll(s));
+const mk = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const r1 = v => +v.toFixed(2);
 
 /* ---------- データ ---------- */
 let DATA, base = window.ZINES_VERSION;
 function load(){
   const orig = JSON.parse(JSON.stringify(window.ZINES));
-  try {
-    const sv = JSON.parse(localStorage.getItem(KEY) || 'null');
-    if (sv && sv.base === base && sv.zines) return sv.zines;
-  } catch (e) {}
+  try { const sv = JSON.parse(localStorage.getItem(KEY) || 'null'); if (sv && sv.base === base && sv.zines) return sv.zines; } catch (e) {}
   return orig;
 }
 DATA = load();
 const editable = z => !!z.pages && !z.pages.some(p => p.word) && !(z.cover.word) && !z.spreads;
 DATA.forEach(z => { [z.cover].concat(z.pages || []).forEach(p => { if (p.stickers && !p.items){ p.items = p.stickers; delete p.stickers; } if (!p.items) p.items = []; }); });
 
-let zi = Math.max(0, DATA.findIndex(editable)), pi = 0, sel = -1, mode = 'select';
+let zi = Math.max(0, DATA.findIndex(editable)), pi = 0, mode = 'select', SEL = [], zm = 1, clip = null, matTab = 'stk', matColor = '', lastCopyPage = -1;
 const Z = () => DATA[zi];
 const pageAt = i => i === 0 ? Z().cover : Z().pages[i - 1];
 const P = () => pageAt(pi);
+const IT = () => P().items;
 const pageCount = () => 1 + Z().pages.length;
+const idxOf = o => IT().indexOf(o);
 
 /* ---------- 保存・やり直し ---------- */
 const imgIds = new Map(), imgBack = [];
@@ -267,20 +289,20 @@ function snap(){
 }
 function unsnap(s){ return JSON.parse(s, (k, v) => (typeof v === 'string' && v[0] === '@') ? imgBack[+v.slice(1)] : v); }
 const hist = [];
-function push(){ hist.push(snap()); if (hist.length > 60) hist.shift(); }
+function push(){ hist.push(snap()); if (hist.length > 80) hist.shift(); }
 let saveT;
 function persist(){
   clearTimeout(saveT);
   saveT = setTimeout(() => {
     try { localStorage.setItem(KEY, JSON.stringify({ base: base, zines: DATA })); }
-    catch (e) { msg('ブラウザの保存がいっぱいです。「書き出す」で保存してください。'); }
+    catch (e) { msg('ブラウザの保存がいっぱいです。「zipで保存」か「公開する」で保存してください。'); }
   }, 300);
 }
 function changed(){ persist(); }
 function msg(t){ $('msg').textContent = t; }
 
 /* ---------- 描画 ---------- */
-const pg = $('page');
+const pg = $('page'), wrap = $('wrap'), center = $('center'), selBox = $('sel');
 let els = [];
 function paperStyle(p){
   ZR.paper(pg, p, PLAIN);
@@ -290,26 +312,27 @@ function paperStyle(p){
   $('texA').value = p.texA || 70; $('texRow').classList.toggle('hide', !p.tex || p.tex === 'none');
   $('paperColor').value = /^#[0-9a-f]{6}$/i.test(p.bg || '') ? p.bg : '#fbf8ee';
 }
+
 function render(){
   pg.innerHTML = '';
   paperStyle(P());
-  els = ZR.addItems(pg, P().items, true);
+  els = ZR.addItems(pg, IT(), true);
   pg.classList.toggle('pen', mode === 'pen'); pg.classList.toggle('erase', mode === 'erase');
-  updateSel(); syncTools(); renderStrip();
+  SEL = SEL.filter(o => IT().indexOf(o) >= 0);
+  refreshSel(); renderStrip(); renderLayers();
 }
 function renderStrip(){
   const s = $('strip'); s.innerHTML = '';
   for (let i = 0; i < pageCount(); i++){
-    const d = pageAt(i), th = document.createElement('div');
-    th.className = 'th' + (i === pi ? ' on' : ''); th.tabIndex = 0; th.setAttribute('role', 'button'); th.setAttribute('aria-label', i === 0 ? '表紙' : i + 'ページ目');
-    const t = document.createElement('div'); t.className = 'pg free' + (d.paper ? ' paper' : ''); t.style.cssText = 'position:absolute;inset:0;overflow:hidden;container-type:size;'; ZR.paper(t, d, PLAIN);
+    const d = pageAt(i), th = mk('div', 'th' + (i === pi ? ' on' : ''));
+    th.tabIndex = 0; th.setAttribute('role', 'button'); th.setAttribute('aria-label', i === 0 ? '表紙' : i + 'ページ目');
+    const t = mk('div', 'pg free' + (d.paper ? ' paper' : '')); t.style.cssText = 'position:absolute;inset:0;overflow:hidden;container-type:size;'; ZR.paper(t, d, PLAIN);
     ZR.addItems(t, d.items); th.appendChild(t);
-    const l = document.createElement('small'); l.textContent = i === 0 ? '表紙' : i; th.appendChild(l);
+    th.appendChild(mk('small', '', i === 0 ? '表紙' : String(i)));
     th.onclick = () => go(i); th.onkeydown = e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(i); } };
     s.appendChild(th);
   }
-  const b = document.createElement('div'); b.className = 'pgbtn';
-  b.innerHTML = '<button type="button" id="padd">ページを足す</button><button type="button" id="pdup">コピー</button><button type="button" id="pl">◀ 前へ</button><button type="button" id="pr">次へ ▶</button><button type="button" id="pdel" style="grid-column:1/3">このページを消す</button>';
+  const b = mk('div', 'pgbtn', '<button type="button" id="padd">ページを足す</button><button type="button" id="pdup">コピー</button><button type="button" id="pl">◀ 前へ</button><button type="button" id="pr">次へ ▶</button><button type="button" id="pdel" style="grid-column:1/-1">このページを消す</button>');
   s.prepend(b);
   $('pl').disabled = pi < 2; $('pr').disabled = pi < 1 || pi >= pageCount() - 1; $('pdel').disabled = false;
   $('padd').onclick = () => { push(); Z().pages.splice(pi, 0, { paper: P().paper, bg: P().bg, items: [] }); if (!Z().pages[pi].paper) delete Z().pages[pi].paper; go(pi + 1); changed(); };
@@ -328,145 +351,482 @@ function renderStrip(){
   };
   const cur = q('.th.on', s); if (cur) cur.scrollIntoView({ block: 'nearest' });
 }
-function go(i){ pi = Math.max(0, Math.min(i, pageCount() - 1)); sel = -1; render(); }
+function go(i){ pi = clamp(i, 0, pageCount() - 1); SEL = []; render(); }
 
-/* ---------- 選んだもの ---------- */
-const selBox = $('sel');
-function itemEl(){ return els[sel]; }
-function rectOf(){ return pg.getBoundingClientRect(); }
-function updateSel(){
-  const it = P().items[sel], n = itemEl();
-  if (!it || !n || it.pen){ selBox.style.display = 'none'; return; }
-  const W = pg.clientWidth, H = pg.clientHeight;
-  const ow = n.offsetWidth, oh = n.offsetHeight;
-  const cx = it.x / 100 * W + ow / 2, cy = it.y / 100 * H + oh / 2;
-  selBox.style.display = 'block';
-  selBox.style.left = (cx - ow / 2) + 'px'; selBox.style.top = (cy - oh / 2) + 'px';
-  selBox.style.width = ow + 'px'; selBox.style.height = oh + 'px';
-  selBox.style.transform = 'rotate(' + (it.r || 0) + 'deg)';
+/* ---------- ズーム ---------- */
+function fitH(){ return Math.max(200, center.clientHeight - 36); }
+function applyZoom(keep){
+  const old = { w: wrap.offsetWidth, h: wrap.offsetHeight, sl: center.scrollLeft, st: center.scrollTop, cw: center.clientWidth, ch: center.clientHeight };
+  wrap.style.height = Math.round(fitH() * zm) + 'px';
+  $('zv').textContent = Math.round(zm * 100) + '%';
+  if (keep && old.w){ const rw = wrap.offsetWidth / old.w, rh = wrap.offsetHeight / old.h; center.scrollLeft = (old.sl + old.cw / 2) * rw - old.cw / 2; center.scrollTop = (old.st + old.ch / 2) * rh - old.ch / 2; }
+  refreshSel();
 }
-function select(i){ sel = i; updateSel(); syncTools(); }
-function syncTools(){
-  const it = P().items[sel], has = it && !it.pen;
-  $('selgrp').classList.toggle('hide', !has);
-  if (!has) return;
-  const isTxt = it.txt != null, isTape = !!it.tape, isShape = !!it.shape, isImg = !isTxt && !isTape && !isShape;
-  $('txtgrp').classList.toggle('hide', !isTxt); $('tapegrp').classList.toggle('hide', !isTape); $('shapegrp').classList.toggle('hide', !isShape);
-  $('border').classList.toggle('hide', !isImg); $('flip').classList.toggle('hide', !(isImg || isShape));
-  $('sizeRow').classList.toggle('hide', isTxt); if (!isTxt) $('sizeR').value = it.w;
-  $('opaR').value = Math.round((it.o == null ? 1 : it.o) * 100);
-  if (isShape){ $('shapeColor').value = /^#[0-9a-f]{6}$/i.test(it.c || '') ? it.c : '#f4a6b8'; $('shapeSk').setAttribute('aria-pressed', String(!!it.sk)); document.querySelectorAll('#shapeSw .sw').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.c === it.c))); }
-  if (isTxt) document.querySelectorAll('#fontRow button').forEach(b => b.setAttribute('aria-pressed', String((it.fn || '') === b.dataset.fn)));
-  if (isImg){ $('border').setAttribute('aria-pressed', String(!!it.pic)); }
-  if (isTxt){ if (document.activeElement !== $('txtIn')) $('txtIn').value = it.txt; $('txtSize').value = it.size || 6; $('txtColor').value = it.ink || '#2a2a2a'; }
-  if (isTape){
-    document.querySelectorAll('#tapeSw .sw').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.c === it.c)));
-    document.querySelectorAll('[data-pat]').forEach(b => b.setAttribute('aria-pressed', String((it.pat || 'stripe') === b.dataset.pat)));
+function setZoom(z, keep){ zm = clamp(z, .4, 4); applyZoom(keep !== false); }
+$('zin').onclick = () => setZoom(zm * 1.25); $('zout').onclick = () => setZoom(zm / 1.25); $('zfit').onclick = () => setZoom(1);
+window.addEventListener('resize', () => applyZoom(false));
+center.addEventListener('wheel', e => { if (!(e.ctrlKey || e.metaKey)) return; e.preventDefault(); setZoom(zm * (e.deltaY < 0 ? 1.1 : 1 / 1.1)); }, { passive: false });
+
+/* ---------- 選択 ---------- */
+const isPen = o => !!o.pen;
+const elOf = o => els[idxOf(o)];
+function relRect(el){ const r = el.getBoundingClientRect(), p = pg.getBoundingClientRect(); return { l: r.left - p.left, t: r.top - p.top, r: r.right - p.left, b: r.bottom - p.top }; }
+function bboxOf(o){
+  if (isPen(o)){
+    const W = pg.clientWidth, H = pg.clientHeight; let l = 1e9, t = 1e9, r = -1e9, b = -1e9;
+    o.pen.forEach(p => { const x = p[0] / 100 * W, y = p[1] / PH * H; l = Math.min(l, x); r = Math.max(r, x); t = Math.min(t, y); b = Math.max(b, y); });
+    const w = (o.wd || .8) / 100 * W / 2 + 2; return { l: l - w, t: t - w, r: r + w, b: b + w };
+  }
+  const el = elOf(o); return el ? relRect(el) : { l: 0, t: 0, r: 0, b: 0 };
+}
+function groupBox(list){
+  let l = 1e9, t = 1e9, r = -1e9, b = -1e9;
+  list.forEach(o => { const k = bboxOf(o); l = Math.min(l, k.l); t = Math.min(t, k.t); r = Math.max(r, k.r); b = Math.max(b, k.b); });
+  return { l: l, t: t, r: r, b: b, w: r - l, h: b - t, cx: (l + r) / 2, cy: (t + b) / 2 };
+}
+function refreshSel(){
+  updateSel(); buildCtx(); buildProps(); markLayers();
+}
+function updateSel(){
+  const list = SEL.filter(o => idxOf(o) >= 0);
+  if (!list.length || mode !== 'select'){ selBox.style.display = 'none'; return; }
+  const single = list.length === 1 && !isPen(list[0]);
+  selBox.style.display = 'block'; selBox.classList.toggle('multi', !single); selBox.classList.toggle('norot', list.length === 1 && isPen(list[0]));
+  if (single){
+    const o = list[0], n = elOf(o); if (!n){ selBox.style.display = 'none'; return; }
+    const W = pg.clientWidth, H = pg.clientHeight, ow = n.offsetWidth, oh = n.offsetHeight;
+    selBox.style.left = (o.x / 100 * W) + 'px'; selBox.style.top = (o.y / 100 * H) + 'px';
+    selBox.style.width = ow + 'px'; selBox.style.height = oh + 'px'; selBox.style.transform = 'rotate(' + (o.r || 0) + 'deg)';
+  } else {
+    const g = groupBox(list);
+    selBox.style.left = g.l + 'px'; selBox.style.top = g.t + 'px'; selBox.style.width = g.w + 'px'; selBox.style.height = g.h + 'px'; selBox.style.transform = '';
   }
 }
-function redrawItem(){
-  const it = P().items[sel], old = els[sel]; if (!it || !old) return;
-  const n = ZR.item(it, true); n.dataset.i = sel; old.replaceWith(n); els[sel] = n; updateSel();
+function setSel(list){ SEL = list.filter(o => idxOf(o) >= 0); refreshSel(); }
+const isSel = o => SEL.indexOf(o) >= 0;
+function redrawItem(o){
+  const i = idxOf(o), old = els[i]; if (!old) return;
+  const n = ZR.item(o, true); n.dataset.i = i; old.replaceWith(n); els[i] = n;
 }
-function setCenter(it, cx, cy){
-  const n = itemEl(); if (!n) return;
+function centerPx(o){
   const W = pg.clientWidth, H = pg.clientHeight;
-  it.x = +((cx - n.offsetWidth / 2) / W * 100).toFixed(2); it.y = +((cy - n.offsetHeight / 2) / H * 100).toFixed(2);
-  n.style.left = it.x + '%'; n.style.top = it.y + '%';
+  if (isPen(o)){ const k = bboxOf(o); return { x: (k.l + k.r) / 2, y: (k.t + k.b) / 2 }; }
+  const n = elOf(o); return { x: o.x / 100 * W + n.offsetWidth / 2, y: o.y / 100 * H + n.offsetHeight / 2 };
 }
+function setCenter(o, cx, cy){
+  const n = elOf(o), W = pg.clientWidth, H = pg.clientHeight; if (!n) return;
+  o.x = r1((cx - n.offsetWidth / 2) / W * 100); o.y = r1((cy - n.offsetHeight / 2) / H * 100);
+  n.style.left = o.x + '%'; n.style.top = o.y + '%';
+}
+function shiftPen(o, dxu, dyu){ o.pen = o.pen.map(p => [r1(p[0] + dxu), r1(p[1] + dyu)]); }
 
 /* ---------- ポインタ操作 ---------- */
-let drag = null;
+let drag = null, spaceDown = false, guides = [];
+function clearGuides(){ guides.forEach(g => g.remove()); guides = []; }
+function addGuide(vert, pos){ const g = mk('div', 'gd'); if (vert){ g.style.cssText = 'left:' + pos + 'px;top:0;bottom:0;width:1px'; } else { g.style.cssText = 'top:' + pos + 'px;left:0;right:0;height:1px'; } wrap.appendChild(g); guides.push(g); }
+function snapTargets(exclude){
+  const W = pg.clientWidth, H = pg.clientHeight, xs = [0, W / 2, W], ys = [0, H / 2, H];
+  IT().forEach(o => { if (exclude.indexOf(o) >= 0 || o.hd) return; const k = bboxOf(o); xs.push(k.l, (k.l + k.r) / 2, k.r); ys.push(k.t, (k.t + k.b) / 2, k.b); });
+  return { xs: xs, ys: ys };
+}
+function snapDelta(vals, targets, tol){
+  let best = null;
+  vals.forEach(v => targets.forEach(t => { const d = t - v; if (Math.abs(d) <= tol && (best === null || Math.abs(d) < Math.abs(best.d))) best = { d: d, t: t }; }));
+  return best;
+}
+function hitItem(e){
+  const t = e.target.closest && e.target.closest('.stk,.txt,.tape,svg.pen');
+  if (!t || !pg.contains(t)) return null;
+  const o = IT()[+t.dataset.i]; return o && !o.lk ? o : null;
+}
 pg.addEventListener('pointerdown', e => {
-  const r = rectOf(), W = r.width, H = r.height;
-  const px = e.clientX - r.left, py = e.clientY - r.top;
+  if (e.button === 1 || spaceDown){ startPan(e); return; }
+  if (e.button !== 0) return;
+  const r = pg.getBoundingClientRect(), W = r.width, H = r.height, px = e.clientX - r.left, py = e.clientY - r.top;
   if (mode === 'pen'){
-    push(); const pts = [[+(px / W * 100).toFixed(1), +(py / H * PH).toFixed(1)]];
+    push(); const pts = [[r1(px / W * 100), r1(py / H * PH)]];
     const it = { pen: pts, c: $('penColor').value, wd: +($('penW').value) / 10 };
-    P().items.push(it); const n = ZR.item(it, true); n.dataset.i = P().items.length - 1; pg.appendChild(n); els.push(n);
-    drag = { type: 'pen', it, n }; pg.setPointerCapture(e.pointerId); e.preventDefault(); return;
+    IT().push(it); const n = ZR.item(it, true); n.dataset.i = IT().length - 1; pg.appendChild(n); els.push(n);
+    drag = { type: 'pen', it: it, n: n }; pg.setPointerCapture(e.pointerId); e.preventDefault(); return;
   }
   if (mode === 'erase'){
     const h = e.target.closest && e.target.closest('svg.pen');
-    if (h){ push(); const i = +h.dataset.i; P().items.splice(i, 1); sel = -1; render(); changed(); }
+    if (h){ push(); IT().splice(+h.dataset.i, 1); SEL = []; render(); changed(); }
     return;
   }
-  const t = e.target.closest && e.target.closest('.stk,.txt,.tape');
-  if (!t){ select(-1); return; }
-  const i = +t.dataset.i; select(i);
-  const it = P().items[i], n = els[i];
-  push();
-  drag = { type: 'move', it, sx: e.clientX, sy: e.clientY, ox: it.x, oy: it.y, W, H };
-  pg.setPointerCapture(e.pointerId); e.preventDefault();
+  const o = hitItem(e);
+  if (!o){
+    const keep = e.shiftKey ? SEL.slice() : [];
+    if (!e.shiftKey) setSel([]);
+    drag = { type: 'marq', x0: px, y0: py, keep: keep }; pg.setPointerCapture(e.pointerId); e.preventDefault(); return;
+  }
+  let narrow = false;
+  if (e.shiftKey){ if (isSel(o)){ setSel(SEL.filter(x => x !== o)); return; } setSel(SEL.concat([o])); }
+  else if (!isSel(o)) setSel([o]); else if (SEL.length > 1) narrow = true;
+  startMove(e, o, narrow);
 });
-selBox.addEventListener('pointerdown', e => {
-  const it = P().items[sel], n = itemEl(); if (!it || !n) return;
-  const r = rectOf(), W = r.width, H = r.height;
-  const cx = it.x / 100 * W + n.offsetWidth / 2, cy = it.y / 100 * H + n.offsetHeight / 2;
+function startMove(e, o, narrow){
+  const r = pg.getBoundingClientRect(), list = SEL.slice();
   push();
-  if (e.target.classList.contains('sz')){
-    drag = { type: 'size', it, cx, cy, d0: Math.hypot(e.clientX - r.left - cx, e.clientY - r.top - cy), w0: it.w, s0: it.size, W, H };
-  } else if (e.target.classList.contains('rot')){
-    drag = { type: 'rot', it, cx, cy };
-  } else return;
+  const base0 = list.map(x => isPen(x) ? { o: x, pts: x.pen.map(p => p.slice()) } : { o: x, x: x.x, y: x.y });
+  drag = { type: 'move', clicked: o, narrow: narrow, moved: false, sx: e.clientX, sy: e.clientY, W: r.width, H: r.height, base: base0, box: groupBox(list), tg: snapTargets(list) };
+  pg.setPointerCapture(e.pointerId); e.preventDefault();
+}
+function startPan(e){ drag = { type: 'pan', sx: e.clientX, sy: e.clientY, sl: center.scrollLeft, st: center.scrollTop }; (e.target.setPointerCapture ? e.target : pg).setPointerCapture(e.pointerId); e.preventDefault(); }
+center.addEventListener('pointerdown', e => { if (e.button === 1 || (spaceDown && e.target === center)) startPan(e); });
+selBox.addEventListener('pointerdown', e => {
+  if (!e.target.classList.contains('sz') && !e.target.classList.contains('rot')) return;
+  const list = SEL.slice(); if (!list.length) return;
+  const r = pg.getBoundingClientRect(), W = r.width, H = r.height;
+  push();
+  if (e.target.classList.contains('rot')){
+    const o = list[0], c = centerPx(o); drag = { type: 'rot', it: o, cx: c.x, cy: c.y };
+  } else {
+    const g = groupBox(list), d0 = Math.hypot(e.clientX - r.left - g.cx, e.clientY - r.top - g.cy);
+    drag = { type: 'size', cx: g.cx, cy: g.cy, d0: Math.max(d0, 1), W: W, H: H, base: list.map(o => ({ o: o, c: centerPx(o), w: o.w, s: o.size, pts: isPen(o) ? o.pen.map(p => p.slice()) : null, wd: o.wd })) };
+  }
   selBox.setPointerCapture(e.pointerId); e.preventDefault(); e.stopPropagation();
 });
 function onMove(e){
   if (!drag) return;
-  const r = rectOf(), W = r.width, H = r.height, px = e.clientX - r.left, py = e.clientY - r.top;
-  const it = drag.it;
+  const r = pg.getBoundingClientRect(), W = r.width, H = r.height, px = e.clientX - r.left, py = e.clientY - r.top;
+  if (drag.type === 'pan'){ center.scrollLeft = drag.sl - (e.clientX - drag.sx); center.scrollTop = drag.st - (e.clientY - drag.sy); return; }
   if (drag.type === 'pen'){
-    const x = +(px / W * 100).toFixed(1), y = +(py / H * PH).toFixed(1), l = it.pen[it.pen.length - 1];
+    const it = drag.it, x = r1(px / W * 100), y = r1(py / H * PH), l = it.pen[it.pen.length - 1];
     if (Math.hypot(x - l[0], y - l[1]) < .35) return;
     it.pen.push([x, y]);
-    const n = ZR.item(it, true); n.dataset.i = drag.n.dataset.i; drag.n.replaceWith(n); drag.n = n; els[els.length - 1] = n;
-  } else if (drag.type === 'move'){
-    it.x = +(drag.ox + (e.clientX - drag.sx) / drag.W * 100).toFixed(2); it.y = +(drag.oy + (e.clientY - drag.sy) / drag.H * 100).toFixed(2);
-    const n = itemEl();
+    const n = ZR.item(it, true); n.dataset.i = drag.n.dataset.i; drag.n.replaceWith(n); drag.n = n; els[els.length - 1] = n; return;
+  }
+  if (drag.type === 'marq'){
+    const x = Math.min(px, drag.x0), y = Math.min(py, drag.y0), w = Math.abs(px - drag.x0), h = Math.abs(py - drag.y0);
+    const m = $('marq'), pr = pg.getBoundingClientRect(), wr = wrap.getBoundingClientRect();
+    m.style.display = 'block'; m.style.left = (x + pr.left - wr.left) + 'px'; m.style.top = (y + pr.top - wr.top) + 'px'; m.style.width = w + 'px'; m.style.height = h + 'px';
+    const hit = IT().filter(o => { if (o.hd || o.lk) return false; const k = bboxOf(o); return k.r >= x && k.l <= x + w && k.b >= y && k.t <= y + h; });
+    SEL = drag.keep.concat(hit.filter(o => drag.keep.indexOf(o) < 0)); updateSel(); return;
+  }
+  if (drag.type === 'move'){
+    let dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+    if (!drag.moved && Math.hypot(dx, dy) < 3) return;
+    drag.moved = true;
+    clearGuides();
     if (!e.altKey){
-      const cxp = it.x + n.offsetWidth / drag.W * 50, cyp = it.y + n.offsetHeight / drag.H * 50, tol = 1.2;
-      const sv = Math.abs(cxp - 50) < tol, sh = Math.abs(cyp - 50) < tol;
-      if (sv) it.x = +(50 - n.offsetWidth / drag.W * 50).toFixed(2);
-      if (sh) it.y = +(50 - n.offsetHeight / drag.H * 50).toFixed(2);
-      $('guideV').style.display = sv ? 'block' : 'none'; $('guideH').style.display = sh ? 'block' : 'none';
-    } n.style.left = it.x + '%'; n.style.top = it.y + '%'; updateSel();
-  } else if (drag.type === 'size'){
-    const f = Math.max(.15, Math.hypot(px - drag.cx, py - drag.cy) / Math.max(drag.d0, 1));
-    if (it.txt != null) it.size = +Math.max(1.5, Math.min(30, drag.s0 * f)).toFixed(2);
-    else it.w = +Math.max(3, Math.min(160, drag.w0 * f)).toFixed(2);
-    const n = ZR.item(it, true); n.dataset.i = sel; els[sel].replaceWith(n); els[sel] = n;
-    setCenter(it, drag.cx, drag.cy); updateSel(); if (it.txt != null) $('txtSize').value = it.size;
-  } else if (drag.type === 'rot'){
+      const b = drag.box, tol = 6;
+      const sx = snapDelta([b.l + dx, b.cx + dx, b.r + dx], drag.tg.xs, tol), sy = snapDelta([b.t + dy, b.cy + dy, b.b + dy], drag.tg.ys, tol);
+      if (sx){ dx += sx.d; addGuide(true, sx.t); } if (sy){ dy += sy.d; addGuide(false, sy.t); }
+    }
+    drag.base.forEach(bs => {
+      if (bs.pts){ bs.o.pen = bs.pts.map(p => [r1(p[0] + dx / W * 100), r1(p[1] + dy / H * PH)]); const n = elOf(bs.o); if (n) n.style.transform = 'translate(' + dx + 'px,' + dy + 'px)'; }
+      else { bs.o.x = r1(bs.x + dx / W * 100); bs.o.y = r1(bs.y + dy / H * 100); const n = elOf(bs.o); n.style.left = bs.o.x + '%'; n.style.top = bs.o.y + '%'; }
+    });
+    updateSel(); return;
+  }
+  if (drag.type === 'size'){
+    const f = clamp(Math.hypot(px - drag.cx, py - drag.cy) / drag.d0, .1, 12);
+    drag.base.forEach(bs => {
+      const o = bs.o;
+      if (bs.pts){ o.pen = bs.pts.map(p => [r1(drag.cx / W * 100 + (p[0] - drag.cx / W * 100) * f), r1(drag.cy / H * PH + (p[1] - drag.cy / H * PH) * f)]); o.wd = r1((bs.wd || .8) * f); redrawItem(o); return; }
+      if (o.txt != null) o.size = r1(clamp(bs.s * f, 1.5, 40)); else o.w = r1(clamp(bs.w * f, 2, 200));
+      redrawItem(o); setCenter(o, drag.cx + (bs.c.x - drag.cx) * f, drag.cy + (bs.c.y - drag.cy) * f);
+    });
+    updateSel(); syncRanges(); return;
+  }
+  if (drag.type === 'rot'){
     let a = Math.atan2(py - drag.cy, px - drag.cx) * 180 / Math.PI + 90;
     if (e.shiftKey) a = Math.round(a / 15) * 15;
     a = ((a + 180) % 360 + 360) % 360 - 180;
-    it.r = +a.toFixed(1); itemEl().style.transform = ZR.tf(it); updateSel();
+    drag.it.r = r1(a); elOf(drag.it).style.transform = ZR.tf(drag.it); updateSel(); syncRanges();
   }
 }
-function onUp(){ $('guideV').style.display = 'none'; $('guideH').style.display = 'none'; if (!drag) return; const t = drag.type; drag = null; if (t === 'pen') renderStrip(); changed(); if (t !== 'pen') renderStrip(); }
-pg.addEventListener('pointermove', onMove); pg.addEventListener('pointerup', onUp); pg.addEventListener('pointercancel', onUp);
-selBox.addEventListener('pointermove', onMove); selBox.addEventListener('pointerup', onUp); selBox.addEventListener('pointercancel', onUp);
-
-/* ---------- 足す ---------- */
-function addItem(it){ push(); P().items.push(it); sel = P().items.length - 1; render(); changed(); }
-function jitter(a){ return +(a + (Math.random() * 10 - 5)).toFixed(1); }
-STICKERS.forEach(src => {
-  const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', 'ステッカーを貼る');
-  const im = document.createElement('img'); im.src = src; im.alt = ''; b.appendChild(im);
-  b.onclick = () => addItem({ src: src, alt: 'イラスト', x: 30, y: 30, w: 30, r: Math.round(jitter(0)) });
-  $('stkpal').appendChild(b);
-});
-$('addPhoto').onclick = () => $('file').click();
-$('file').onchange = async e => {
-  const files = Array.from(e.target.files); e.target.value = '';
-  for (let k = 0; k < files.length; k++){
-    try {
-      const src = await shrink(files[k]);
-      push(); P().items.push({ src: src, alt: '写真', x: 14 + k * 4, y: 14 + k * 5, w: 60, r: Math.round(jitter(0)) });
-    } catch (err) { msg('この画像は読み込めませんでした'); }
+function onUp(e){
+  const d = drag; drag = null; clearGuides(); $('marq').style.display = 'none';
+  if (!d) return;
+  if (d.type === 'pan') return;
+  if (d.type === 'move'){
+    if (!d.moved){ hist.pop(); if (d.narrow) setSel([d.clicked]); return; }
+    d.base.forEach(bs => { if (bs.pts) redrawItem(bs.o); });
   }
-  sel = P().items.length - 1; render(); changed();
+  if (d.type === 'marq'){ refreshSel(); return; }
+  if (d.type === 'pen'){ renderStrip(); renderLayers(); changed(); return; }
+  updateSel(); changed(); renderStrip(); renderLayers(); buildProps();
+}
+['pointermove'].forEach(t => { pg.addEventListener(t, onMove); selBox.addEventListener(t, onMove); center.addEventListener(t, onMove); });
+['pointerup', 'pointercancel'].forEach(t => { pg.addEventListener(t, onUp); selBox.addEventListener(t, onUp); center.addEventListener(t, onUp); });
+pg.addEventListener('dblclick', e => { const o = hitItem(e); if (o && o.txt != null){ setSel([o]); const t = $('txtIn'); if (t){ t.focus(); t.select(); } } });
+// 画像をドラッグして入れる
+center.addEventListener('dragover', e => { if (e.dataTransfer && Array.from(e.dataTransfer.types || []).indexOf('Files') >= 0) e.preventDefault(); });
+center.addEventListener('drop', e => { const f = e.dataTransfer && e.dataTransfer.files; if (f && f.length){ e.preventDefault(); addFiles(Array.from(f), false); } });
+
+/* ---------- 共通の小道具 ---------- */
+function chip(label, on, fn, cls){ const b = mk('button', cls || '', label); b.type = 'button'; b.setAttribute('aria-pressed', String(!!on)); b.onclick = fn; return b; }
+function live(inp, apply, after){
+  let pushed = false;
+  inp.addEventListener('input', e => { if (!pushed){ push(); pushed = true; } apply(e.target.type === 'range' || e.target.type === 'number' ? +e.target.value : e.target.value, e); });
+  inp.addEventListener('change', () => { pushed = false; changed(); renderStrip(); renderLayers(); if (after) after(); });
+}
+function swatches(list, cur, fn){ const w = mk('span', 'row'); list.forEach(c => { const b = mk('button', 'sw'); b.type = 'button'; b.style.background = c; b.setAttribute('aria-label', '色'); b.setAttribute('aria-pressed', String(String(cur || '').toLowerCase() === c.toLowerCase())); b.onclick = () => fn(c); w.appendChild(b); }); return w; }
+const kindOf = o => o.pen ? 'pen' : o.txt != null ? 'txt' : o.tape ? 'tape' : o.shape ? (ZR.cat.lines.some(l => l[0] === o.shape) ? 'line' : ZR.cat.papers.some(l => l[0] === o.shape) ? 'paper' : 'shape') : 'img';
+const nameOf = o => { const k = kindOf(o); if (k === 'txt') return o.txt.replace(/\s+/g, ' ').slice(0, 14) || '文字'; if (k === 'tape') return 'マステ'; if (k === 'pen') return 'ペンの線'; if (k === 'img') return o.pic ? '写真' : (o.alt === '写真' ? '写真' : (o.alt || 'イラスト')); const all = ZR.cat.shapes.concat(ZR.cat.lines, ZR.cat.papers).find(a => a[0] === o.shape); return all ? all[1] : 'かたち'; };
+const ICON = {
+  front: '<svg viewBox="0 0 20 20"><rect x="7" y="7" width="10" height="10" rx="1"/><path d="M3 13V3h10"/></svg>',
+  back: '<svg viewBox="0 0 20 20"><rect x="3" y="3" width="10" height="10" rx="1"/><path d="M7 17h10V7"/></svg>',
+  fwd: '<svg viewBox="0 0 20 20"><path d="M10 16V5M5 9l5-5 5 5"/></svg>',
+  bwd: '<svg viewBox="0 0 20 20"><path d="M10 4v11M5 11l5 5 5-5"/></svg>',
+  dup: '<svg viewBox="0 0 20 20"><rect x="7" y="7" width="10" height="10" rx="1"/><path d="M13 3H4v9"/></svg>',
+  del: '<svg viewBox="0 0 20 20"><path d="M4 6h12M8 6V4h4v2M6 6l1 11h6l1-11"/></svg>',
+  flip: '<svg viewBox="0 0 20 20"><path d="M10 3v14M7 6L3 15h4zM13 6l4 9h-4z"/></svg>',
+  lock: '<svg viewBox="0 0 20 20"><rect x="4" y="9" width="12" height="8" rx="1"/><path d="M7 9V6a3 3 0 016 0v3"/></svg>',
+  al: '<svg viewBox="0 0 20 20"><path d="M3 2v16M6 5h10v4H6zM6 12h6v4H6z"/></svg>',
+  ac: '<svg viewBox="0 0 20 20"><path d="M10 2v16M4 5h12v4H4zM6 12h8v4H6z"/></svg>',
+  ar: '<svg viewBox="0 0 20 20"><path d="M17 2v16M4 5h10v4H4zM8 12h6v4H8z"/></svg>',
+  at: '<svg viewBox="0 0 20 20"><path d="M2 3h16M5 6h4v10H5zM12 6h4v6h-4z"/></svg>',
+  am: '<svg viewBox="0 0 20 20"><path d="M2 10h16M5 4h4v12H5zM12 6h4v8h-4z"/></svg>',
+  ab: '<svg viewBox="0 0 20 20"><path d="M2 17h16M5 4h4v10H5zM12 8h4v6h-4z"/></svg>',
+  dh: '<svg viewBox="0 0 20 20"><path d="M2 3v14M18 3v14M8 6h4v8H8z"/></svg>',
+  dv: '<svg viewBox="0 0 20 20"><path d="M3 2h14M3 18h14M6 8h8v4H6z"/></svg>'
 };
+function ib(icon, title, fn, pressed){ const b = mk('button', 'ic', icon); b.type = 'button'; b.title = title; b.setAttribute('aria-label', title); if (pressed != null) b.setAttribute('aria-pressed', String(pressed)); b.onclick = fn; return b; }
+const grp = (...kids) => { const g = mk('div', 'g'); kids.forEach(k => k && g.appendChild(k)); return g; };
+
+/* ---------- 操作(複数まとめて) ---------- */
+function delSel(){ if (!SEL.length) return; push(); const s = new Set(SEL); P().items = IT().filter(o => !s.has(o)); SEL = []; render(); changed(); }
+function dupSel(off){
+  if (!SEL.length) return; push();
+  const list = SEL.slice().sort((a, b) => idxOf(a) - idxOf(b)), out = [];
+  list.forEach(o => { const c = JSON.parse(JSON.stringify(o)); delete c.lk; if (c.pen) c.pen = c.pen.map(p => [r1(p[0] + (off || 3)), r1(p[1] + (off || 3))]); else { c.x = r1(c.x + (off || 3)); c.y = r1(c.y + (off || 3)); } IT().push(c); out.push(c); });
+  SEL = out; render(); changed();
+}
+function reorder(kind){
+  if (!SEL.length) return; push();
+  const s = new Set(SEL); let a = IT().slice();
+  if (kind === 'front') a = a.filter(o => !s.has(o)).concat(a.filter(o => s.has(o)));
+  else if (kind === 'back') a = a.filter(o => s.has(o)).concat(a.filter(o => !s.has(o)));
+  else if (kind === 'fwd'){ for (let i = a.length - 2; i >= 0; i--) if (s.has(a[i]) && !s.has(a[i + 1])){ const t = a[i]; a[i] = a[i + 1]; a[i + 1] = t; } }
+  else { for (let i = 1; i < a.length; i++) if (s.has(a[i]) && !s.has(a[i - 1])){ const t = a[i]; a[i] = a[i - 1]; a[i - 1] = t; } }
+  P().items = a; render(); changed();
+}
+function alignSel(kind){
+  if (!SEL.length) return; push();
+  const W = pg.clientWidth, H = pg.clientHeight, ref = SEL.length > 1 ? groupBox(SEL) : { l: 0, t: 0, r: W, b: H, cx: W / 2, cy: H / 2 };
+  SEL.forEach(o => {
+    const k = bboxOf(o); let dx = 0, dy = 0;
+    if (kind === 'l') dx = ref.l - k.l; else if (kind === 'c') dx = ref.cx - (k.l + k.r) / 2; else if (kind === 'r') dx = ref.r - k.r;
+    else if (kind === 't') dy = ref.t - k.t; else if (kind === 'm') dy = ref.cy - (k.t + k.b) / 2; else if (kind === 'b') dy = ref.b - k.b;
+    if (isPen(o)) shiftPen(o, dx / W * 100, dy / H * PH); else { o.x = r1(o.x + dx / W * 100); o.y = r1(o.y + dy / H * 100); }
+  });
+  render(); changed();
+}
+function distribute(axis){
+  if (SEL.length < 3) return; push();
+  const W = pg.clientWidth, H = pg.clientHeight, L = SEL.map(o => ({ o: o, k: bboxOf(o) }));
+  L.sort((a, b) => axis === 'h' ? (a.k.l + a.k.r) - (b.k.l + b.k.r) : (a.k.t + a.k.b) - (b.k.t + b.k.b));
+  const first = L[0].k, last = L[L.length - 1].k;
+  const c0 = axis === 'h' ? (first.l + first.r) / 2 : (first.t + first.b) / 2, c1 = axis === 'h' ? (last.l + last.r) / 2 : (last.t + last.b) / 2;
+  L.forEach((e, i) => {
+    const want = c0 + (c1 - c0) * i / (L.length - 1), have = axis === 'h' ? (e.k.l + e.k.r) / 2 : (e.k.t + e.k.b) / 2, d = want - have;
+    if (isPen(e.o)) { if (axis === 'h') shiftPen(e.o, d / W * 100, 0); else shiftPen(e.o, 0, d / H * PH); }
+    else if (axis === 'h') e.o.x = r1(e.o.x + d / W * 100); else e.o.y = r1(e.o.y + d / H * 100);
+  });
+  render(); changed();
+}
+function flipSel(){ push(); const on = !SEL.every(o => o.f); SEL.forEach(o => { if (isPen(o) || o.txt != null || o.tape) return; if (on) o.f = 1; else delete o.f; const n = elOf(o); if (n) n.style.transform = ZR.tf(o); }); changed(); renderStrip(); buildCtx(); }
+function lockSel(){ push(); const on = !SEL.every(o => o.lk); SEL.forEach(o => { if (on) o.lk = 1; else delete o.lk; }); SEL = on ? [] : SEL; render(); changed(); }
+
+/* ---------- 上のバー ---------- */
+function buildCtx(){
+  const c = $('ctx'); c.innerHTML = '';
+  if (mode === 'pen'){
+    const col = mk('input'); col.type = 'color'; col.id = 'penColor'; col.value = penState.c; col.setAttribute('aria-label', 'ペンの色');
+    const sw = swatches(PEN_COLORS, penState.c, cc => { penState.c = cc; col.value = cc; buildCtx(); });
+    col.oninput = () => { penState.c = col.value; qa('.sw', c).forEach(x => x.setAttribute('aria-pressed', 'false')); };
+    const w = mk('input'); w.type = 'range'; w.id = 'penW'; w.min = 3; w.max = 40; w.value = penState.w; w.setAttribute('aria-label', 'ペンの太さ'); w.oninput = () => { penState.w = +w.value; };
+    c.appendChild(grp(sw, col)); c.appendChild(grp(mk('label', '', '太さ'), w)); c.appendChild(mk('span', '', '<span id="ctxHint">ページの上をなぞると線が描けます</span>'));
+    return;
+  }
+  if (mode === 'erase'){ c.appendChild(mk('span', '', '<span id="ctxHint">消したい線をクリックします(ペンで描いた線だけ消えます)</span>')); return; }
+  const list = SEL.filter(o => idxOf(o) >= 0);
+  if (!list.length){ c.appendChild(mk('span', '', '<span id="ctxHint">ページの上のものをクリックして選びます。Shiftで複数、何もないところをドラッグで囲んで選べます。右の「素材」から貼れます。</span>')); return; }
+  const single = list.length === 1 ? list[0] : null, anyNonPen = list.some(o => !isPen(o)), allPen = list.every(isPen);
+  if (single && !isPen(single)){
+    const r = mk('input'); r.type = 'number'; r.id = 'cRot'; r.min = -180; r.max = 180; r.step = 1; r.value = Math.round(single.r || 0); r.setAttribute('aria-label', '回転の角度');
+    live(r, v => { single.r = clamp(Math.round(v) || 0, -180, 180); elOf(single).style.transform = ZR.tf(single); updateSel(); });
+    c.appendChild(grp(mk('label', '', '回転'), r, mk('span', 'sub', '°')));
+    if (single.txt == null){
+      const s = mk('input'); s.type = 'range'; s.id = 'cSize'; s.min = 3; s.max = 140; s.step = .5; s.value = single.w || 30; s.setAttribute('aria-label', '大きさ');
+      live(s, v => { const cc = centerPx(single); single.w = v; redrawItem(single); setCenter(single, cc.x, cc.y); updateSel(); });
+      c.appendChild(grp(mk('label', '', '大きさ'), s));
+    }
+  }
+  if (anyNonPen){
+    const o = mk('input'); o.type = 'range'; o.id = 'cOpa'; o.min = 10; o.max = 100; o.value = Math.round((list[0].o == null ? 1 : list[0].o) * 100); o.setAttribute('aria-label', 'うすさ');
+    live(o, v => { list.forEach(it => { if (isPen(it)) return; if (v >= 100) delete it.o; else it.o = r1(v / 100); const n = elOf(it); if (n) n.style.opacity = v >= 100 ? '' : v / 100; }); });
+    c.appendChild(grp(mk('label', '', 'うすさ'), o));
+  }
+  c.appendChild(grp(ib(ICON.back, '一番うしろへ (Ctrl+[)', () => reorder('back')), ib(ICON.bwd, 'ひとつうしろへ', () => reorder('bwd')), ib(ICON.fwd, 'ひとつ前へ', () => reorder('fwd')), ib(ICON.front, '一番前へ (Ctrl+])', () => reorder('front'))));
+  c.appendChild(grp(ib(ICON.al, '左にそろえる', () => alignSel('l')), ib(ICON.ac, '左右の中央', () => alignSel('c')), ib(ICON.ar, '右にそろえる', () => alignSel('r')), ib(ICON.at, '上にそろえる', () => alignSel('t')), ib(ICON.am, '上下の中央', () => alignSel('m')), ib(ICON.ab, '下にそろえる', () => alignSel('b')),
+    list.length > 2 ? ib(ICON.dh, '横に等間隔', () => distribute('h')) : null, list.length > 2 ? ib(ICON.dv, 'たてに等間隔', () => distribute('v')) : null));
+  c.appendChild(grp(
+    list.some(o => !isPen(o) && o.txt == null && !o.tape) ? ib(ICON.flip, '左右反転', flipSel, list.every(o => o.f)) : null,
+    ib(ICON.lock, 'ロック(動かないようにする)', lockSel, false), ib(ICON.dup, '複製 (Ctrl+D)', () => dupSel()), ib(ICON.del, '削除 (Delete)', delSel)));
+  if (list.length > 1) c.appendChild(mk('span', 'sub', list.length + '個を選択中'));
+}
+const penState = { c: '#2a2a2a', w: 8 };
+function syncRanges(){
+  const o = SEL.length === 1 ? SEL[0] : null; if (!o || isPen(o)) return;
+  const r = $('cRot'); if (r && document.activeElement !== r) r.value = Math.round(o.r || 0);
+  const s = $('cSize'); if (s && document.activeElement !== s && o.w != null) s.value = o.w;
+  const t = $('txtSize'); if (t && o.size != null && document.activeElement !== t) t.value = o.size;
+}
+
+/* ---------- 右上: 種類ごとの設定 ---------- */
+function buildProps(){
+  const box = $('props'); box.innerHTML = '';
+  const o = SEL.length === 1 && mode === 'select' ? SEL[0] : null;
+  box.classList.toggle('hide', !o); if (!o) return;
+  const k = kindOf(o), after = () => { redrawItem(o); updateSel(); };
+  const done = () => { changed(); renderStrip(); renderLayers(); buildProps(); };
+  const set = (fn) => { push(); fn(); after(); done(); };
+  if (k === 'txt'){
+    box.appendChild(mk('b', '', '文字'));
+    const t = mk('textarea'); t.id = 'txtIn'; t.value = o.txt; t.setAttribute('aria-label', '文字');
+    t.addEventListener('focus', () => { t._p = false; });
+    t.addEventListener('input', () => { if (!t._p){ push(); t._p = true; } o.txt = t.value; elOf(o).textContent = o.txt; updateSel(); changed(); });
+    t.addEventListener('blur', () => { renderStrip(); renderLayers(); });
+    box.appendChild(t);
+    const f = mk('div', 'chips'); FONT_OPTS.forEach(([v, l]) => f.appendChild(chip(l, (o.fn || '') === v, () => set(() => { if (v) o.fn = v; else delete o.fn; })))); box.appendChild(f);
+    const row = mk('div', 'row');
+    const sz = mk('input'); sz.type = 'range'; sz.id = 'txtSize'; sz.min = 2; sz.max = 30; sz.step = .5; sz.value = o.size || 6; sz.setAttribute('aria-label', '文字の大きさ');
+    live(sz, v => { o.size = v; redrawItem(o); updateSel(); });
+    const col = mk('input'); col.type = 'color'; col.value = /^#[0-9a-f]{6}$/i.test(o.ink || '') ? o.ink : '#2a2a2a'; col.setAttribute('aria-label', '文字の色');
+    live(col, v => { o.ink = v; redrawItem(o); });
+    row.appendChild(mk('label', 'sub', '大きさ')); row.appendChild(sz); row.appendChild(col); box.appendChild(row);
+    const r2 = mk('div', 'row'); r2.appendChild(chip('太く', !!o.b, () => set(() => { if (o.b) delete o.b; else o.b = 1; })));
+    const ls = mk('input'); ls.type = 'range'; ls.min = 0; ls.max = .4; ls.step = .02; ls.value = o.ls || 0; ls.setAttribute('aria-label', '文字の間隔');
+    live(ls, v => { if (v) o.ls = v; else delete o.ls; redrawItem(o); updateSel(); });
+    r2.appendChild(mk('label', 'sub', '間隔')); r2.appendChild(ls); box.appendChild(r2);
+    const r3 = mk('div', 'row'); r3.appendChild(mk('span', 'sub', 'マーカー'));
+    r3.appendChild(chip('なし', !o.hl, () => set(() => delete o.hl)));
+    HL_COLORS.forEach(c => { const b = mk('button', 'sw'); b.type = 'button'; b.style.background = c; b.setAttribute('aria-label', 'マーカーの色'); b.setAttribute('aria-pressed', String(o.hl === c)); b.onclick = () => set(() => { o.hl = c; }); r3.appendChild(b); });
+    box.appendChild(r3);
+  } else if (k === 'tape'){
+    box.appendChild(mk('b', '', 'マステ'));
+    const row = mk('div', 'row'); row.appendChild(swatches(TAPE_COLORS, o.c, c => set(() => { o.c = c; })));
+    const col = mk('input'); col.type = 'color'; col.value = /^#[0-9a-f]{6}$/i.test(o.c || '') ? o.c : '#f4a6b8'; col.setAttribute('aria-label', '好きな色'); live(col, v => { o.c = v; redrawItem(o); }); row.appendChild(col); box.appendChild(row);
+    const f = mk('div', 'chips'); TAPE_PATS.forEach(([v, l]) => f.appendChild(chip(l, (o.pat || 'stripe') === v, () => set(() => { o.pat = v; })))); box.appendChild(f);
+  } else if (k === 'shape' || k === 'line' || k === 'paper'){
+    box.appendChild(mk('b', '', k === 'line' ? 'らくがき' : k === 'paper' ? '紙もの' : 'かたち'));
+    const row = mk('div', 'row'); row.appendChild(swatches(MAT_COLORS, o.c, c => set(() => { o.c = c; })));
+    const col = mk('input'); col.type = 'color'; col.value = /^#[0-9a-f]{6}$/i.test(o.c || '') ? o.c : (/^#[0-9a-f]{6}$/i.test(ZR.defColor(o.shape)) ? ZR.defColor(o.shape) : '#f4a6b8'); col.setAttribute('aria-label', '好きな色'); live(col, v => { o.c = v; redrawItem(o); }); row.appendChild(col); box.appendChild(row);
+    if (k === 'shape'){ const r2 = mk('div', 'row'); r2.appendChild(chip('ふちどり', !!o.sk, () => set(() => { if (o.sk) delete o.sk; else o.sk = '#2a2a2a'; }))); box.appendChild(r2); }
+    if (k === 'line'){
+      const r2 = mk('div', 'row'); const sw = mk('input'); sw.type = 'range'; sw.min = 1; sw.max = 9; sw.step = .2; sw.value = o.sw || 3.2; sw.setAttribute('aria-label', '線の太さ'); live(sw, v => { o.sw = v; redrawItem(o); });
+      r2.appendChild(mk('label', 'sub', '太さ')); r2.appendChild(sw); r2.appendChild(chip('手書き風', o.rg !== 0, () => set(() => { if (o.rg === 0) delete o.rg; else o.rg = 0; }))); box.appendChild(r2);
+    }
+    if (k === 'paper'){ box.appendChild(mk('span', 'sub', '写真のふち(ポラロイド・切手・フィルム)は、写真を「うしろへ」するとはまります。')); }
+  } else if (k === 'pen'){
+    box.appendChild(mk('b', '', 'ペンの線'));
+    const row = mk('div', 'row'); row.appendChild(swatches(PEN_COLORS, o.c, c => set(() => { o.c = c; })));
+    const col = mk('input'); col.type = 'color'; col.value = /^#[0-9a-f]{6}$/i.test(o.c || '') ? o.c : '#2a2a2a'; live(col, v => { o.c = v; redrawItem(o); }); row.appendChild(col); box.appendChild(row);
+    const r2 = mk('div', 'row'); const w = mk('input'); w.type = 'range'; w.min = .3; w.max = 4; w.step = .1; w.value = o.wd || .8; live(w, v => { o.wd = v; redrawItem(o); updateSel(); });
+    r2.appendChild(mk('label', 'sub', '太さ')); r2.appendChild(w); box.appendChild(r2);
+  } else {
+    box.appendChild(mk('b', '', o.alt === '写真' ? '写真' : '絵'));
+    const row = mk('div', 'row'); row.appendChild(chip('白いふち', !!o.pic, () => set(() => { if (o.pic) delete o.pic; else o.pic = true; }))); box.appendChild(row);
+  }
+}
+
+/* ---------- 重なり(レイヤー) ---------- */
+function thumbOf(o){
+  const k = kindOf(o), t = mk('span', 'tn');
+  if (k === 'img'){ const i = mk('img'); i.src = o.src; i.alt = ''; t.appendChild(i); }
+  else if (k === 'txt'){ t.textContent = 'あ'; }
+  else if (k === 'pen'){ t.textContent = '✎'; }
+  else if (k === 'tape'){ t.style.background = o.c || '#F4A6B8'; }
+  else { const n = ZR.item({ shape: o.shape, c: o.c, sk: o.sk, w: 100, x: 0, y: 0 }, false); t.appendChild(n); }
+  return t;
+}
+let layDrag = null;
+function renderLayers(){
+  const box = $('layers'); if (!box) return; box.innerHTML = '';
+  const items = IT();
+  if (!items.length){ box.appendChild(mk('span', 'sub', 'まだ何も貼っていません')); return; }
+  for (let i = items.length - 1; i >= 0; i--){
+    const o = items[i], row = mk('div', 'ly' + (isSel(o) ? ' on' : '') + (o.hd ? ' hid' : '')); row.draggable = true; row.dataset.i = i;
+    const eye = mk('button', '', o.hd ? '◌' : '●'); eye.type = 'button'; eye.title = o.hd ? '表示する' : '隠す'; eye.setAttribute('aria-pressed', String(!o.hd));
+    eye.onclick = ev => { ev.stopPropagation(); push(); if (o.hd) delete o.hd; else o.hd = 1; render(); changed(); };
+    const lk = mk('button', '', o.lk ? '🔒' : '🔓'); lk.type = 'button'; lk.title = o.lk ? 'ロックをはずす' : 'ロック'; lk.setAttribute('aria-pressed', String(!!o.lk));
+    lk.onclick = ev => { ev.stopPropagation(); push(); if (o.lk) delete o.lk; else { o.lk = 1; SEL = SEL.filter(x => x !== o); } render(); changed(); };
+    row.appendChild(eye); row.appendChild(lk); row.appendChild(thumbOf(o)); row.appendChild(mk('span', 'nm', nameOf(o).replace(/</g, '&lt;')));
+    row.onclick = ev => { if (ev.shiftKey || ev.ctrlKey || ev.metaKey) setSel(isSel(o) ? SEL.filter(x => x !== o) : SEL.concat([o])); else setSel([o]); };
+    row.addEventListener('dragstart', ev => { layDrag = o; ev.dataTransfer.effectAllowed = 'move'; try { ev.dataTransfer.setData('text/plain', 'layer'); } catch (e) {} });
+    row.addEventListener('dragover', ev => { if (layDrag){ ev.preventDefault(); row.classList.add('over'); } });
+    row.addEventListener('dragleave', () => row.classList.remove('over'));
+    row.addEventListener('drop', ev => { ev.preventDefault(); row.classList.remove('over'); if (!layDrag || layDrag === o) return; push(); const a = IT().slice(), from = a.indexOf(layDrag); a.splice(from, 1); a.splice(a.indexOf(o) + 1, 0, layDrag); P().items = a; layDrag = null; render(); changed(); });
+    row.addEventListener('dragend', () => { layDrag = null; qa('.ly.over').forEach(r => r.classList.remove('over')); });
+    box.appendChild(row);
+  }
+}
+function markLayers(){ const items = IT(); qa('#layers .ly').forEach(r => r.classList.toggle('on', isSel(items[+r.dataset.i]))); }
+
+/* ---------- 素材パネル ---------- */
+const PASTEL = ['#F4A6B8','#F1D56A','#8FB8E8','#A9D4A0','#F2A65A','#C9B3E6'];
+let pastelN = 0;
+const nextPastel = () => matColor || PASTEL[pastelN++ % PASTEL.length];
+const MAT_TABS = [['stk', 'ステッカー'], ['shp', 'かたち'], ['line', 'らくがき'], ['paper', '紙もの'], ['tape', 'マステ'], ['text', '文字']];
+function jitter(a){ return r1(a + (Math.random() * 10 - 5)); }
+function place(o){ if (o.x === 30 && o.y === 30){ o.x = r1(20 + Math.random() * 22); o.y = r1(18 + Math.random() * 30); } push(); IT().push(o); SEL = [o]; render(); changed(); }
+function buildMat(){
+  const tabs = $('matTabs'); tabs.innerHTML = '';
+  MAT_TABS.forEach(([k, l]) => tabs.appendChild(chip(l, matTab === k, () => { matTab = k; buildMat(); })));
+  const cr = $('matColorRow'), cs = $('matColors'); cs.innerHTML = '';
+  cr.classList.toggle('hide', !(matTab === 'shp' || matTab === 'line' || matTab === 'paper' || matTab === 'tape'));
+  { const a = mk('button', 'sw auto'); a.type = 'button'; a.title = 'おまかせの色'; a.setAttribute('aria-label', 'おまかせの色'); a.setAttribute('aria-pressed', String(!matColor)); a.onclick = () => { matColor = ''; buildMat(); }; cs.appendChild(a); }
+  MAT_COLORS.forEach(c => { const b = mk('button', 'sw'); b.type = 'button'; b.style.background = c; b.setAttribute('aria-label', '色'); b.setAttribute('aria-pressed', String(matColor.toLowerCase() === c.toLowerCase())); b.onclick = () => { matColor = c; buildMat(); }; cs.appendChild(b); });
+  const body = $('matBody'); body.innerHTML = '';
+  const grid = mk('div', 'stkpal');
+  if (matTab === 'stk'){
+    STICKERS.forEach(src => { const b = mk('button'); b.type = 'button'; b.setAttribute('aria-label', 'ステッカーを貼る'); const im = mk('img'); im.src = src; im.alt = ''; b.appendChild(im); b.onclick = () => place({ src: src, alt: 'イラスト', x: 30, y: 30, w: 30, r: Math.round(jitter(0)) }); grid.appendChild(b); });
+    const w = mk('button', 'wide', '＋ 自分の絵'); w.type = 'button'; w.onclick = () => $('fileStk').click(); grid.appendChild(w);
+    body.appendChild(grid); body.appendChild(mk('p', 'sub', '透明のPNGなら、ふちなしできれいに貼れます。'));
+  } else if (matTab === 'shp' || matTab === 'line' || matTab === 'paper'){
+    const list = matTab === 'shp' ? ZR.cat.shapes : matTab === 'line' ? ZR.cat.lines : ZR.cat.papers;
+    list.forEach(([k, l], i) => {
+      const b = mk('button'); b.type = 'button'; b.title = l; b.setAttribute('aria-label', l);
+      const pc = matTab === 'shp' ? (matColor || PASTEL[i % 6]) : matTab === 'line' ? (matColor || '#2a2a2a') : (matColor || undefined);
+      b.appendChild(ZR.item({ shape: k, c: pc, w: 100, x: 0, y: 0, rg: 0 }, false));
+      b.onclick = () => {
+        const ar = ZR.arOf(k), w = matTab === 'line' ? (ar >= 3 ? 40 : 24) : matTab === 'paper' ? (ar >= 2 ? 40 : 30) : 24;
+        const o = { shape: k, alt: l, x: 30, y: 30, w: w, r: matTab === 'paper' ? Math.round(jitter(0) / 2) : 0 };
+        if (matTab === 'shp') o.c = nextPastel(); else if (matTab === 'line') o.c = matColor || '#2a2a2a'; else if (matColor) o.c = matColor;
+        place(o);
+      };
+      grid.appendChild(b);
+    });
+    body.appendChild(grid);
+    if (matTab === 'paper') body.appendChild(mk('p', 'sub', 'ポラロイド・切手・フィルムは、貼ったあとに写真を「うしろへ」すると、ふちにはまります。'));
+  } else if (matTab === 'tape'){
+    TAPE_PATS.forEach(([p, l]) => {
+      const b = mk('button'); b.type = 'button'; b.title = l; b.setAttribute('aria-label', l + 'のマステ');
+      const box = mk('div'); box.style.cssText = 'position:absolute;inset:0;container-type:size;overflow:hidden';
+      const pc = matColor || TAPE_COLORS[0];
+      const t = ZR.item({ tape: true, c: pc, pat: p, x: 8, y: 36, w: 84, r: -4 }, false); box.appendChild(t); b.style.position = 'relative'; b.appendChild(box); b.onclick = () => place({ tape: true, c: matColor || TAPE_COLORS[Math.floor(Math.random() * TAPE_COLORS.length)], pat: p, x: 25, y: 12, w: 34, r: Math.round(jitter(-4)) });
+      grid.appendChild(b);
+    });
+    body.appendChild(grid);
+  } else {
+    const presets = [
+      ['見出し', { txt: 'タイトル', size: 9, fn: 'dela', ink: '#2a2a2a' }, 'font-family:"Dela Gothic One"'],
+      ['手書きメモ', { txt: 'ひとこと', size: 6, ink: '#2a2a2a' }, 'font-family:"Klee One"'],
+      ['やわらかい', { txt: 'きょうの一枚', size: 6, fn: 'yomogi', ink: '#2a2a2a' }, 'font-family:Yomogi'],
+      ['日付スタンプ', { txt: '2026.11.26', size: 4.5, fn: 'mincho', ls: .1, ink: '#7c655f', r: -4 }, 'font-family:"Shippori Mincho";letter-spacing:.1em'],
+      ['英字タイトル', { txt: 'my little zine', size: 8, fn: 'cor', ink: '#2a2a2a' }, 'font-family:"Cormorant Garamond";font-style:italic'],
+      ['マーカー', { txt: 'だいじなこと', size: 6, hl: '#FFE66D', ink: '#2a2a2a' }, 'background-image:linear-gradient(transparent 58%,#FFE66D 58%)'],
+      ['ゴシック', { txt: 'caption', size: 4, fn: 'gothic', ink: '#55554f' }, 'font-family:"Zen Kaku Gothic New"']
+    ];
+    presets.forEach(([l, o, st]) => { const b = mk('button', '', l); b.type = 'button'; b.style.cssText = 'display:block;width:100%;text-align:left;margin-bottom:6px;padding:8px 10px;font-size:15px;' + st; b.onclick = () => place(Object.assign({ x: 14, y: 20, r: 0 }, o)); body.appendChild(b); });
+  }
+}
+
+/* ---------- 入れる(写真・絵) ---------- */
 function shrink(file, png){
   return new Promise((res, rej) => {
     const u = URL.createObjectURL(file), im = new Image();
@@ -480,82 +840,81 @@ function shrink(file, png){
     im.src = u;
   });
 }
-$('addText').onclick = () => { addItem({ txt: 'ここに書く', x: 16, y: 20, size: 6, r: 0, ink: $('txtColor').value || '#2a2a2a' }); const t = $('txtIn'); t.focus(); t.select(); };
-$('addTape').onclick = () => addItem({ tape: true, c: TAPE_COLORS[Math.floor(Math.random() * TAPE_COLORS.length)], pat: 'stripe', x: 25, y: 12, w: 34, r: Math.round(jitter(-4)) });
-const SHAPE_NAMES = { star:'ほし', heart:'ハート', circle:'まる', square:'しかく', triangle:'さんかく', flower:'おはな', sparkle:'きらきら', burst:'ギザギザ', cloud:'くも', bubble:'ふきだし', moon:'つき', arrow:'やじるし', banner:'リボン', leaf:'は', ring:'わっか', frame:'わく' };
-const SHAPE_COLORS = ['#F4A6B8','#F1D56A','#8FB8E8','#A9D4A0','#F2A65A','#C9B3E6','#FFFFFF','#2a2a2a','#D8322A','#7c655f'];
-let lastShapeColor = '#F4A6B8';
-Object.keys(SHAPE_NAMES).forEach(k => {
-  const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', SHAPE_NAMES[k]); b.title = SHAPE_NAMES[k];
-  b.appendChild(ZR.item({ shape: k, c: '#8a8a82', x: 0, y: 0, w: 100 }, false));
-  b.onclick = () => addItem({ shape: k, alt: SHAPE_NAMES[k], c: lastShapeColor, x: 34, y: 34, w: 26, r: 0 });
-  $('shppal').appendChild(b);
-});
-SHAPE_COLORS.forEach(c => { const b = document.createElement('button'); b.type = 'button'; b.className = 'sw'; b.dataset.c = c; b.style.background = c; b.setAttribute('aria-label', 'かたちの色'); b.onclick = () => { const it = P().items[sel]; if (!it) return; push(); it.c = c; lastShapeColor = c; redrawItem(); syncTools(); changed(); renderStrip(); }; $('shapeSw').appendChild(b); });
-$('shapeColor').oninput = e => { const it = P().items[sel]; if (!it || !it.shape) return; it.c = e.target.value; lastShapeColor = it.c; redrawItem(); };
-$('shapeColor').onchange = () => { push(); renderStrip(); changed(); };
-$('shapeSk').onclick = () => { const it = P().items[sel]; if (!it) return; push(); if (it.sk) delete it.sk; else it.sk = '#2a2a2a'; redrawItem(); syncTools(); changed(); renderStrip(); };
-[['', '手書き'], ['yomogi', 'やわらかい'], ['gothic', 'ゴシック'], ['mincho', '明朝'], ['dela', '太字']].forEach(([k, l]) => {
-  const b = document.createElement('button'); b.type = 'button'; b.dataset.fn = k; b.textContent = l; b.style.fontSize = '12px';
-  b.onclick = () => { const it = P().items[sel]; if (!it || it.txt == null) return; push(); if (k) it.fn = k; else delete it.fn; redrawItem(); syncTools(); changed(); renderStrip(); };
-  $('fontRow').appendChild(b);
-});
-$('addImg').onclick = () => $('fileStk').click();
-$('fileStk').onchange = async e => {
-  const files = Array.from(e.target.files); e.target.value = '';
+async function addFiles(files, png){
+  const out = [];
   for (let k = 0; k < files.length; k++){
-    try { const src = await shrink(files[k], true); push(); P().items.push({ src: src, alt: 'イラスト', x: 24 + k * 4, y: 24 + k * 5, w: 34, r: 0 }); }
+    if (!/^image\//.test(files[k].type)) continue;
+    try { const src = await shrink(files[k], png); out.push(png ? { src: src, alt: 'イラスト', x: 24 + k * 4, y: 24 + k * 5, w: 34, r: 0 } : { src: src, alt: '写真', x: 14 + k * 4, y: 14 + k * 5, w: 60, r: Math.round(jitter(0)) }); }
     catch (err) { msg('この画像は読み込めませんでした'); }
   }
-  sel = P().items.length - 1; render(); changed();
-};
-function keepCenter(fn){ const it = P().items[sel], n = itemEl(); if (!it || !n) return; const W = pg.clientWidth, H = pg.clientHeight; const cx = it.x / 100 * W + n.offsetWidth / 2, cy = it.y / 100 * H + n.offsetHeight / 2; fn(it); redrawItem(); setCenter(it, cx, cy); updateSel(); }
-$('sizeR').onfocus = () => push();
-$('sizeR').oninput = e => keepCenter(it => { it.w = +e.target.value; });
-$('sizeR').onchange = () => { renderStrip(); changed(); };
-$('opaR').onfocus = () => push();
-$('opaR').oninput = e => { const it = P().items[sel]; if (!it) return; const v = +e.target.value / 100; if (v >= 1) delete it.o; else it.o = +v.toFixed(2); itemEl().style.opacity = v >= 1 ? '' : v; };
-$('opaR').onchange = () => { renderStrip(); changed(); };
-$('flip').onclick = () => { const it = P().items[sel]; if (!it) return; push(); if (it.f) delete it.f; else it.f = 1; itemEl().style.transform = ZR.tf(it); changed(); renderStrip(); };
-$('cenH').onclick = () => { const it = P().items[sel], n = itemEl(); if (!it || !n) return; push(); it.x = +((100 - n.offsetWidth / pg.clientWidth * 100) / 2).toFixed(2); n.style.left = it.x + '%'; updateSel(); changed(); renderStrip(); };
-$('cenV').onclick = () => { const it = P().items[sel], n = itemEl(); if (!it || !n) return; push(); it.y = +((100 - n.offsetHeight / pg.clientHeight * 100) / 2).toFixed(2); n.style.top = it.y + '%'; updateSel(); changed(); renderStrip(); };
-
-/* ---------- 選んだものの操作 ---------- */
-$('txtIn').oninput = e => { const it = P().items[sel]; if (!it || it.txt == null) return; it.txt = e.target.value; itemEl().textContent = it.txt; updateSel(); changed(); };
-$('txtIn').onfocus = () => push();
-$('txtSize').oninput = e => { const it = P().items[sel]; it.size = +e.target.value; redrawItem(); changed(); };
-$('txtSize').onchange = () => renderStrip();
-$('txtColor').oninput = e => { const it = P().items[sel]; if (it && it.txt != null){ it.ink = e.target.value; redrawItem(); changed(); } };
-$('txtColor').onchange = () => renderStrip();
-TAPE_COLORS.forEach(c => { const b = document.createElement('button'); b.type = 'button'; b.className = 'sw'; b.dataset.c = c; b.style.background = c; b.setAttribute('aria-label', 'マステの色'); b.onclick = () => { push(); P().items[sel].c = c; redrawItem(); syncTools(); changed(); renderStrip(); }; $('tapeSw').appendChild(b); });
-document.querySelectorAll('[data-pat]').forEach(b => b.onclick = () => { push(); P().items[sel].pat = b.dataset.pat; redrawItem(); syncTools(); changed(); renderStrip(); });
-$('border').onclick = () => { const it = P().items[sel]; push(); it.pic = !it.pic; if (!it.pic) delete it.pic; redrawItem(); syncTools(); changed(); renderStrip(); };
-$('front').onclick = () => { const a = P().items; if (sel < 0 || sel >= a.length - 1) return; push(); [a[sel], a[sel + 1]] = [a[sel + 1], a[sel]]; sel++; render(); changed(); };
-$('back').onclick = () => { const a = P().items; if (sel < 1) return; push(); [a[sel], a[sel - 1]] = [a[sel - 1], a[sel]]; sel--; render(); changed(); };
-$('dup').onclick = () => { const it = P().items[sel]; if (!it) return; push(); const c = JSON.parse(JSON.stringify(it)); c.x = +(c.x + 4).toFixed(1); c.y = +(c.y + 4).toFixed(1); P().items.push(c); sel = P().items.length - 1; render(); changed(); };
-function del(){ if (sel < 0) return; push(); P().items.splice(sel, 1); sel = -1; render(); changed(); }
-$('del').onclick = del;
-
-/* ---------- 道具・紙 ---------- */
-function setMode(m){
-  mode = m; sel = -1;
-  document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === m)));
-  pg.classList.toggle('pen', m === 'pen'); pg.classList.toggle('erase', m === 'erase'); updateSel(); syncTools();
+  if (!out.length) return;
+  push(); out.forEach(o => IT().push(o)); SEL = out; render(); changed();
 }
-document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => setMode(b.dataset.mode));
-PEN_COLORS.forEach(c => { const b = document.createElement('button'); b.type = 'button'; b.className = 'sw'; b.style.background = c; b.setAttribute('aria-label', 'ペンの色'); b.setAttribute('aria-pressed', String(c === $('penColor').value)); b.onclick = () => { $('penColor').value = c; document.querySelectorAll('#penSw .sw').forEach(x => x.setAttribute('aria-pressed', String(x === b))); setMode('pen'); }; $('penSw').appendChild(b); });
-$('penColor').oninput = () => { document.querySelectorAll('#penSw .sw').forEach(x => x.setAttribute('aria-pressed', 'false')); setMode('pen'); };
+$('addPhoto').onclick = () => $('file').click();
+$('file').onchange = e => { const f = Array.from(e.target.files); e.target.value = ''; addFiles(f, false); };
+$('addImg').onclick = () => $('fileStk').click();
+$('fileStk').onchange = e => { const f = Array.from(e.target.files); e.target.value = ''; addFiles(f, true); };
+
+/* ---------- 道具・紙・タブ ---------- */
+function setMode(m){
+  mode = m; SEL = [];
+  qa('[data-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === m)));
+  pg.classList.toggle('pen', m === 'pen'); pg.classList.toggle('erase', m === 'erase'); refreshSel();
+}
+qa('[data-mode]').forEach(b => b.onclick = () => setMode(b.dataset.mode));
+qa('[data-tab]').forEach(b => b.onclick = () => {
+  qa('[data-tab]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  ['mat', 'page', 'lay'].forEach(t => $('pane-' + t).classList.toggle('hide', t !== b.dataset.tab));
+  if (b.dataset.tab === 'lay') renderLayers();
+});
 const BG_PRESETS = ['#FBF8EE','#FFFFFF','#EAF1FA','#F8E3E8','#FFF3C4','#E4F0DC','#D9B98C','#2B2B30'];
-BG_PRESETS.forEach(c => { const b = document.createElement('button'); b.type = 'button'; b.className = 'sw'; b.style.background = c; b.setAttribute('aria-label', '紙の色'); b.onclick = () => { push(); P().bg = c; paperStyle(P()); renderStrip(); changed(); }; $('bgSw').appendChild(b); });
-{ const ci = document.createElement('input'); ci.type = 'color'; ci.id = 'paperColor'; ci.setAttribute('aria-label', '好きな色'); $('bgSw').appendChild(ci); }
+BG_PRESETS.forEach(c => { const b = mk('button', 'sw'); b.type = 'button'; b.style.background = c; b.setAttribute('aria-label', '紙の色'); b.onclick = () => { push(); P().bg = c; paperStyle(P()); renderStrip(); changed(); }; $('bgSw').appendChild(b); });
+{ const ci = mk('input'); ci.type = 'color'; ci.id = 'paperColor'; ci.setAttribute('aria-label', '好きな色'); $('bgSw').appendChild(ci); }
 $('paperColor').oninput = e => { P().bg = e.target.value; paperStyle(P()); };
 $('paperColor').onchange = () => { push(); renderStrip(); changed(); };
-document.querySelectorAll('[data-paper]').forEach(b => b.onclick = () => { push(); const p = P(); if (b.dataset.paper === 'lined') p.paper = true; else delete p.paper; paperStyle(p); renderStrip(); changed(); });
-document.querySelectorAll('[data-tex]').forEach(b => b.onclick = () => { push(); const p = P(); if (b.dataset.tex === 'none'){ delete p.tex; delete p.texA; } else { p.tex = b.dataset.tex; if (!p.texA) p.texA = 70; } paperStyle(p); renderStrip(); changed(); });
+qa('[data-paper]').forEach(b => b.onclick = () => { push(); const p = P(); if (b.dataset.paper === 'lined') p.paper = true; else delete p.paper; paperStyle(p); renderStrip(); changed(); });
+$('lines').oninput = e => { P().lines = +e.target.value; paperStyle(P()); };
+$('lines').onchange = () => { renderStrip(); changed(); };
+$('lines').onpointerdown = () => push();
+$('linesAll').onclick = () => { push(); const n = P().lines || 24; [Z().cover].concat(Z().pages).forEach(p => { p.lines = n; }); renderStrip(); changed(); msg('線の数をぜんぶのページに合わせました'); };
+qa('[data-tex]').forEach(b => b.onclick = () => { push(); const p = P(); if (b.dataset.tex === 'none'){ delete p.tex; delete p.texA; } else { p.tex = b.dataset.tex; if (!p.texA) p.texA = 70; } paperStyle(p); renderStrip(); changed(); });
 $('texA').oninput = e => { const p = P(); p.texA = +e.target.value; paperStyle(p); };
 $('texA').onchange = () => { renderStrip(); changed(); };
 $('texA').onpointerdown = () => push();
 $('texAll').onclick = () => { push(); const p = P(); [Z().cover].concat(Z().pages).forEach(q => { if (p.tex){ q.tex = p.tex; q.texA = p.texA || 70; } else { delete q.tex; delete q.texA; } }); renderStrip(); changed(); msg('質感をぜんぶのページに合わせました'); };
+
+/* ---------- キー ---------- */
+document.addEventListener('keydown', e => {
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'textarea' || (tag === 'input' && e.target.type !== 'range' && e.target.type !== 'checkbox') || tag === 'select') return;
+  const mod = e.ctrlKey || e.metaKey, k = e.key;
+  if (k === ' ' && !spaceDown){ spaceDown = true; center.classList.add('pan'); e.preventDefault(); return; }
+  if (mod && k.toLowerCase() === 'z'){ e.preventDefault(); $('undo').click(); return; }
+  if (mod && k.toLowerCase() === 'a'){ e.preventDefault(); setSel(IT().filter(o => !o.hd && !o.lk)); return; }
+  if (mod && k.toLowerCase() === 'd'){ e.preventDefault(); dupSel(); return; }
+  if (mod && k.toLowerCase() === 'c'){ if (SEL.length){ e.preventDefault(); clip = JSON.parse(JSON.stringify(SEL.slice().sort((a, b) => idxOf(a) - idxOf(b)))); msg(SEL.length + '個をコピーしました'); } return; }
+  if (mod && k.toLowerCase() === 'x'){ if (SEL.length){ e.preventDefault(); clip = JSON.parse(JSON.stringify(SEL.slice().sort((a, b) => idxOf(a) - idxOf(b)))); delSel(); } return; }
+  if (mod && k.toLowerCase() === 'v'){ if (clip && clip.length){ e.preventDefault(); push(); const out = clip.map(o => { const c = JSON.parse(JSON.stringify(o)); if (c.pen) c.pen = c.pen.map(p => [r1(p[0] + 3), r1(p[1] + 3)]); else { c.x = r1(c.x + 3); c.y = r1(c.y + 3); } return c; }); out.forEach(o => IT().push(o)); clip = JSON.parse(JSON.stringify(out)); SEL = out; render(); changed(); } return; }
+  if (mod && k === ']'){ e.preventDefault(); reorder('front'); return; }
+  if (mod && k === '['){ e.preventDefault(); reorder('back'); return; }
+  if (mod) return;
+  if (k === 'Escape'){ setSel([]); if (mode !== 'select') setMode('select'); return; }
+  if (k === 'v' || k === 'V'){ setMode('select'); return; }
+  if (k === 'p' || k === 'P'){ setMode('pen'); return; }
+  if (k === 'e' || k === 'E'){ setMode('erase'); return; }
+  if (k === '+' || k === '='){ setZoom(zm * 1.25); return; }
+  if (k === '-'){ setZoom(zm / 1.25); return; }
+  if (k === '0'){ setZoom(1); return; }
+  if (!SEL.length || mode !== 'select') return;
+  if (k === 'Delete' || k === 'Backspace'){ e.preventDefault(); delSel(); return; }
+  const m = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[k];
+  if (m){
+    e.preventDefault(); const st = e.shiftKey ? 3 : .5; push();
+    SEL.forEach(o => { if (isPen(o)) shiftPen(o, m[0] * st, m[1] * st); else { o.x = r1(o.x + m[0] * st); o.y = r1(o.y + m[1] * st); } });
+    render(); changed();
+  }
+});
+document.addEventListener('keyup', e => { if (e.key === ' '){ spaceDown = false; center.classList.remove('pan'); } });
 
 /* ---------- ZINE ---------- */
 function fillSelect(){
@@ -573,21 +932,10 @@ $('znew').onclick = () => {
   DATA.unshift({ id: id, label: label, noEnd: true, cover: { paper: true, items: [] }, pages: [{ paper: true, items: [] }, { paper: true, items: [] }] });
   zi = 0; fillSelect(); go(0); changed();
 };
-$('undo').onclick = () => { if (!hist.length) return msg('これ以上戻せません'); DATA[zi] = unsnap(hist.pop()); sel = -1; pi = Math.min(pi, pageCount() - 1); render(); changed(); };
+
+$('undo').onclick = () => { if (!hist.length) return msg('これ以上戻せません'); DATA[zi] = unsnap(hist.pop()); SEL = []; pi = Math.min(pi, pageCount() - 1); render(); changed(); };
 $('reset').onclick = () => { if (!confirm('編集したものを全部すてて、最初の状態に戻します。よろしいですか?')) return; localStorage.removeItem(KEY); location.reload(); };
 $('preview').onclick = () => { persist(); try { localStorage.setItem(KEY, JSON.stringify({ base: base, zines: DATA })); } catch (e) {} window.open('index.html?preview=1#' + Z().id, '_blank'); };
-
-/* ---------- キー ---------- */
-document.addEventListener('keydown', e => {
-  const tag = (e.target.tagName || '').toLowerCase();
-  if (tag === 'textarea' || tag === 'input' || tag === 'select') return;
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z'){ e.preventDefault(); $('undo').click(); return; }
-  if (sel < 0) return;
-  if (e.key === 'Delete' || e.key === 'Backspace'){ e.preventDefault(); del(); return; }
-  const m = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
-  if (m){ e.preventDefault(); const it = P().items[sel], st = e.shiftKey ? 3 : .5; push(); it.x = +(it.x + m[0] * st).toFixed(2); it.y = +(it.y + m[1] * st).toFixed(2); const n = itemEl(); n.style.left = it.x + '%'; n.style.top = it.y + '%'; updateSel(); changed(); }
-});
-window.addEventListener('resize', updateSel);
 
 /* ---------- 書き出し(zip) ---------- */
 const crcT = (() => { const t = []; for (let n = 0; n < 256; n++){ let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
@@ -669,8 +1017,10 @@ $('publish').onclick = async () => {
   } finally { publishing = false; $('publish').disabled = false; }
 };
 
+
+buildMat(); buildCtx(); applyZoom(false);
 fillSelect(); go(0);
-window.__zed = { DATA: () => DATA, P: () => P(), setMode: setMode };
+window.__zed = { DATA: () => DATA, P: () => P(), setMode: setMode, SEL: () => SEL, setSel: setSel };
 })();
 </script>
 </body>
