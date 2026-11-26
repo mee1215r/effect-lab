@@ -267,6 +267,7 @@ ZINES.forEach(z => {
   b.addEventListener('click', () => openZine(z.id));
   $('picker').appendChild(b);
 });
+if (ZINES.length < 2) $('picker').style.display = 'none';
 $('prev').addEventListener('click', () => pf && pf.flipPrev());
 $('next').addEventListener('click', () => pf && pf.flipNext());
 document.addEventListener('keydown', ev => {
