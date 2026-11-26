@@ -24,12 +24,13 @@
   .bar select,.bar input{border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:#fff}
   .bar input{width:9.5em}
   .main{flex:1;min-height:0;display:flex}
-  #strip{width:128px;flex:none;overflow:auto;padding:12px 10px;border-right:1px solid var(--line);background:#f6f6f2;display:flex;flex-direction:column;gap:10px}
-  .th{position:relative;width:100%;aspect-ratio:3/4;border:2px solid transparent;border-radius:3px;overflow:hidden;cursor:pointer;flex:none;box-shadow:0 0 0 1px var(--line)}
+  #strip{width:236px;flex:none;overflow-y:scroll;padding:12px 10px;border-right:1px solid var(--line);background:#f6f6f2;display:grid;grid-template-columns:1fr 1fr;gap:10px;align-content:start;grid-auto-rows:max-content;scrollbar-width:auto}
+  #strip::-webkit-scrollbar{width:12px}#strip::-webkit-scrollbar-thumb{background:#b9b9b2;border-radius:6px;border:2px solid #f6f6f2}
+  .th{position:relative;width:100%;height:auto;aspect-ratio:3/4;min-height:0;border:2px solid transparent;border-radius:3px;overflow:hidden;cursor:pointer;flex:none;box-shadow:0 0 0 1px var(--line)}
   .th.on{border-color:var(--ink)}
   .th .pg{pointer-events:none}
   .th small{position:absolute;left:3px;bottom:2px;background:#fff;border-radius:3px;padding:0 4px;font-size:11px;z-index:5}
-  .pgbtn{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .pgbtn{display:grid;grid-template-columns:1fr 1fr;gap:6px;grid-column:1/-1;grid-row:1;position:sticky;top:-12px;z-index:6;background:#f6f6f2;padding:12px 0 8px;margin-top:-12px}
   .pgbtn button{padding:5px 4px;font-size:12px}
   #center{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;padding:18px;overflow:auto}
   #wrap{position:relative;height:min(100%,calc(100vh - 110px));aspect-ratio:3/4;flex:none;box-shadow:0 8px 30px rgba(0,0,0,.18);touch-action:none}
@@ -68,7 +69,7 @@
   dialog input[type=password]{width:100%;border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin-bottom:10px}
   dialog .row{justify-content:flex-end}
   #msg{font-size:12px;color:var(--sub);min-height:1.4em}
-  @media (max-width:900px){.main{flex-direction:column}#strip{width:auto;flex-direction:row;border-right:0;border-bottom:1px solid var(--line)}.th{width:70px}#tools{width:auto;border-left:0;border-top:1px solid var(--line)}}
+  @media (max-width:900px){.main{flex-direction:column}#strip{width:auto;display:flex;flex-direction:row;border-right:0;border-bottom:1px solid var(--line)}.th{width:70px}#tools{width:auto;border-left:0;border-top:1px solid var(--line)}}
 </style>
 </head>
 <body>
@@ -157,11 +158,12 @@
       <div class="row">
         <button type="button" data-tex="none">なし</button>
         <button type="button" data-tex="grain">ざらざら</button>
+        <button type="button" data-tex="cold">画用紙</button>
         <button type="button" data-tex="fiber">和紙</button>
         <button type="button" data-tex="crumple">しわ</button>
       </div>
       <div class="row" id="texRow">
-        <label style="display:flex;align-items:center;gap:8px;flex:1">濃さ <input type="range" id="texA" min="10" max="100" value="60" aria-label="質感の濃さ"></label>
+        <label style="display:flex;align-items:center;gap:8px;flex:1">濃さ <input type="range" id="texA" min="10" max="100" value="70" aria-label="質感の濃さ"></label>
         <button type="button" id="texAll">全ページに</button>
       </div>
     </div>
@@ -196,8 +198,8 @@
   <div id="tokmsg" style="font-size:12px;min-height:1.4em;margin-bottom:8px"></div>
   <div class="row"><button type="button" id="tokclear">消す</button><button type="button" id="tokcancel">とじる</button><button type="button" id="toksave" style="background:#111;color:#fff;border-color:#111">保存してつなぐ</button></div>
 </dialog>
-<script src="zines-data.js"></script>
-<script src="zine-render.js"></script>
+<script>document.write('<script src="zines-data.js?t='+Date.now()+'"><\/script>')</script>
+<script>document.write('<script src="zine-render.js?t='+Date.now()+'"><\/script>')</script>
 <script>
 (function(){
 const PH = 133.333;
@@ -259,7 +261,7 @@ function paperStyle(p){
   $('linesRow').classList.toggle('hide', !p.paper); $('lines').value = p.lines || 24; $('linesV').textContent = p.lines || 24;
   document.querySelectorAll('[data-paper]').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.paper === 'lined') === !!p.paper)));
   document.querySelectorAll('[data-tex]').forEach(b => b.setAttribute('aria-pressed', String((p.tex || 'none') === b.dataset.tex)));
-  $('texA').value = p.texA || 60; $('texRow').classList.toggle('hide', !p.tex || p.tex === 'none');
+  $('texA').value = p.texA || 70; $('texRow').classList.toggle('hide', !p.tex || p.tex === 'none');
   $('paperColor').value = /^#[0-9a-f]{6}$/i.test(p.bg || '') ? p.bg : '#fbf8ee';
 }
 function render(){
@@ -282,7 +284,7 @@ function renderStrip(){
   }
   const b = document.createElement('div'); b.className = 'pgbtn';
   b.innerHTML = '<button type="button" id="padd">ページを足す</button><button type="button" id="pdup">コピー</button><button type="button" id="pl">◀ 前へ</button><button type="button" id="pr">次へ ▶</button><button type="button" id="pdel" style="grid-column:1/3">このページを消す</button>';
-  s.appendChild(b);
+  s.prepend(b);
   $('pl').disabled = pi < 2; $('pr').disabled = pi < 1 || pi >= pageCount() - 1; $('pdel').disabled = pi < 1;
   $('padd').onclick = () => { push(); Z().pages.splice(pi, 0, { paper: P().paper, bg: P().bg, items: [] }); if (!Z().pages[pi].paper) delete Z().pages[pi].paper; go(pi + 1); changed(); };
   $('pdup').onclick = () => { if (pi < 1) return msg('表紙はコピーできません'); push(); Z().pages.splice(pi, 0, JSON.parse(JSON.stringify(P()))); go(pi + 1); changed(); };
@@ -466,11 +468,11 @@ BG_PRESETS.forEach(c => { const b = document.createElement('button'); b.type = '
 $('paperColor').oninput = e => { P().bg = e.target.value; paperStyle(P()); };
 $('paperColor').onchange = () => { push(); renderStrip(); changed(); };
 document.querySelectorAll('[data-paper]').forEach(b => b.onclick = () => { push(); const p = P(); if (b.dataset.paper === 'lined') p.paper = true; else delete p.paper; paperStyle(p); renderStrip(); changed(); });
-document.querySelectorAll('[data-tex]').forEach(b => b.onclick = () => { push(); const p = P(); if (b.dataset.tex === 'none'){ delete p.tex; delete p.texA; } else { p.tex = b.dataset.tex; if (!p.texA) p.texA = 60; } paperStyle(p); renderStrip(); changed(); });
+document.querySelectorAll('[data-tex]').forEach(b => b.onclick = () => { push(); const p = P(); if (b.dataset.tex === 'none'){ delete p.tex; delete p.texA; } else { p.tex = b.dataset.tex; if (!p.texA) p.texA = 70; } paperStyle(p); renderStrip(); changed(); });
 $('texA').oninput = e => { const p = P(); p.texA = +e.target.value; paperStyle(p); };
 $('texA').onchange = () => { renderStrip(); changed(); };
 $('texA').onpointerdown = () => push();
-$('texAll').onclick = () => { push(); const p = P(); [Z().cover].concat(Z().pages).forEach(q => { if (p.tex){ q.tex = p.tex; q.texA = p.texA || 60; } else { delete q.tex; delete q.texA; } }); renderStrip(); changed(); msg('質感をぜんぶのページに合わせました'); };
+$('texAll').onclick = () => { push(); const p = P(); [Z().cover].concat(Z().pages).forEach(q => { if (p.tex){ q.tex = p.tex; q.texA = p.texA || 70; } else { delete q.tex; delete q.texA; } }); renderStrip(); changed(); msg('質感をぜんぶのページに合わせました'); };
 
 /* ---------- ZINE ---------- */
 function fillSelect(){
