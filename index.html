@@ -99,8 +99,9 @@
 <footer>© 2026 <a href="edit.html" class="ed">編集</a></footer>
 
 <script src="vendor/page-flip.browser.js"></script>
-<script src="zines-data.js"></script>
-<script src="zine-render.js"></script>
+<script src="gsap.min.js"></script>
+<script>document.write('<script src="zines-data.js?t='+Date.now()+'"><\/script>')</script>
+<script>document.write('<script src="zine-render.js?t='+Date.now()+'"><\/script>')</script>
 <script>
 /* ZINEの中身は zines-data.js にあります(edit.html で作って書き出します)。 */
 try {
@@ -194,6 +195,44 @@ function updatePos(){
   $('next').disabled = i >= total - 1;
 }
 
+
+/* ページを開いたとき、貼ってあるものが順に「ぺた」と貼られる動き(GSAP) */
+const canAnim = typeof gsap !== 'undefined' && !reduceMotion;
+const seen = new WeakSet();
+function things(page){ return [...page.querySelectorAll('.pg > .stk, .pg > .txt, .pg > .tape, .pg > svg.pen')]; }
+function hideAll(book){
+  if (!canAnim) return;
+  book.querySelectorAll('.page').forEach(p => things(p).forEach(n => { n.style.visibility = 'hidden'; }));
+}
+function revealVisible(book){
+  if (!canAnim) return;
+  const r = book.getBoundingClientRect();
+  book.querySelectorAll('.page').forEach(p => {
+    if (seen.has(p)) return;
+    const b = p.getBoundingClientRect();
+    const vis = b.width > 0 && b.right > r.left + 4 && b.left < r.right - 4 && b.bottom > r.top && b.top < r.bottom && getComputedStyle(p).display !== 'none';
+    if (!vis) return;
+    seen.add(p);
+    let i = 0;
+    things(p).forEach(n => {
+      n.style.visibility = '';
+      const at = .15 + i * .13; i++;
+      if (n.matches('svg.pen')) {
+        n.querySelectorAll('path:not(.hit)').forEach(pa => {
+          pa.setAttribute('pathLength', '1');
+          gsap.fromTo(pa, { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: .9, delay: at, ease: 'power1.inOut', onComplete: () => { pa.style.strokeDasharray = 'none'; } });
+        });
+      } else if (n.matches('.tape')) {
+        gsap.from(n, { scaleX: 0, transformOrigin: '0% 50%', opacity: 0, duration: .45, delay: at, ease: 'power2.out' });
+      } else if (n.matches('.txt')) {
+        gsap.from(n, { opacity: 0, y: 6, duration: .6, delay: at, ease: 'power2.out' });
+      } else {
+        gsap.from(n, { scale: .6, opacity: 0, y: -14, duration: .55, delay: at, ease: 'back.out(2.2)' });
+      }
+    });
+  });
+}
+
 function openZine(id){
   const z = ZINES.find(x => x.id === id) || ZINES[0];
   if (current === z) return;
@@ -211,11 +250,13 @@ function openZine(id){
     flippingTime: reduceMotion ? 1 : 900, mobileScrollSupport: true, usePortrait: true
   });
   pf.loadFromHTML(book.querySelectorAll('.page'));
-  pf.on('flip', updatePos);
+  hideAll(book);
+  pf.on('flip', () => { updatePos(); revealVisible(book); });
   pf.on('changeOrientation', updatePos);
   fitWords();
   book.classList.add('ready');
   updatePos();
+  if (canAnim) { gsap.from(book, { opacity: 0, y: 14, duration: .5, ease: 'power2.out' }); setTimeout(() => revealVisible(book), 120); }
   document.title = z.label;
   document.querySelectorAll('#picker button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === z.id)));
   try { history.replaceState(null, '', '#' + z.id); } catch(e){}
