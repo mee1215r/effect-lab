@@ -1,5 +1,5 @@
 /* このファイルは edit.html の「公開する」「zipで保存」で作りなおされます。手で直してもかまいません。 */
-window.ZINES_VERSION = "2026-11-26T14-37-21-953Z";
+window.ZINES_VERSION = "2026-11-26T14-40-31-501Z";
 window.ZINES = [
  {
   "id": "2026-11-26",
@@ -8,22 +8,22 @@ window.ZINES = [
   "cover": {
    "items": [
     {
+     "shape": "graph",
+     "alt": "方眼紙",
+     "x": -19.51,
+     "y": -5.26,
+     "w": 142.58,
+     "r": -0.17,
+     "c": "#2a2a2a",
+     "o": 0.12
+    },
+    {
      "src": "dino2.png",
      "alt": "イラスト",
      "x": 79.19,
      "y": 31.52,
      "w": 18.86,
      "r": 6
-    },
-    {
-     "shape": "graph",
-     "alt": "方眼紙",
-     "x": -19.51,
-     "y": -5.25,
-     "w": 142.58,
-     "r": -0.17,
-     "c": "#2a2a2a",
-     "o": 0.12
     },
     {
      "tape": true,
@@ -35,7 +35,16 @@ window.ZINES = [
      "r": 0
     },
     {
-     "src": "photos/u-mwxnpc4e1.jpg",
+     "tape": true,
+     "c": "#F2A65A",
+     "pat": "gingham",
+     "x": -2,
+     "y": 88.6,
+     "w": 50.28,
+     "r": -1
+    },
+    {
+     "src": "photos/u-mwxntedm1.jpg",
      "alt": "写真",
      "x": 3.04,
      "y": 14.29,
@@ -52,7 +61,7 @@ window.ZINES = [
      "r": 0
     },
     {
-     "src": "photos/u-mwxnpc4g2.jpg",
+     "src": "photos/u-mwxntedo2.jpg",
      "alt": "写真",
      "x": 34.07,
      "y": 56.29,
@@ -84,6 +93,14 @@ window.ZINES = [
      "r": 0,
      "ink": "#000000",
      "fn": "mincho"
+    },
+    {
+     "src": "dino3.png",
+     "alt": "イラスト",
+     "x": 9.32,
+     "y": 80.75,
+     "w": 14.45,
+     "r": 19.66
     }
    ],
    "bg": "#D9B98C"
