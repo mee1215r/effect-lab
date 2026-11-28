@@ -43,6 +43,10 @@
   #book{width:100%;max-width:1100px;height:min(76vh,760px);min-height:380px;margin:0 auto;visibility:hidden}
   #book{overflow:hidden}
   #book.ready{visibility:visible}
+  .rings{position:absolute;left:50%;top:0;bottom:0;width:0;z-index:60;pointer-events:none;display:none}
+  .rings i{position:absolute;left:-11px;width:22px;height:9%;border-radius:11px;background:linear-gradient(90deg,#7d7152 0,#efe6c6 38%,#a39674 62%,#6f6345 100%);box-shadow:0 2px 5px rgba(0,0,0,.4),inset 0 0 0 1px rgba(0,0,0,.12)}
+  .rings i:nth-child(1){top:12%}.rings i:nth-child(2){top:45.5%}.rings i:nth-child(3){top:79%}
+  .rings i::after{content:"";position:absolute;left:50%;top:18%;bottom:18%;width:4px;margin-left:-2px;border-radius:2px;background:rgba(0,0,0,.28)}
 
   .controls{position:relative;z-index:20;display:flex;justify-content:center;align-items:center;gap:8px 40px;flex-wrap:wrap;padding:18px 0 6px}
   .controls button{all:unset;box-sizing:border-box;cursor:pointer;font-family:var(--serif);font-size:2rem;line-height:1;padding:4px 18px}
@@ -99,7 +103,7 @@
 <footer>© 2026 <a href="edit.html" class="ed">編集</a></footer>
 
 <script src="vendor/page-flip.browser.js"></script>
-<script src="gsap.min.js"></script>
+<script src="vendor/gsap.min.js"></script>
 <script>document.write('<script src="zines-data.js?t='+Date.now()+'"><\/script>')</script>
 <script>document.write('<script src="zine-render.js?t='+Date.now()+'"><\/script>')</script>
 <script>
@@ -155,14 +159,14 @@ function freePage(d, side, maxSize){
 function wrap(pg, hard){ const p = el('div', 'page'); if (hard) p.dataset.density = 'hard'; p.appendChild(pg); return p; }
 
 function buildPages(z, book){
-  if (z.cover.bg || z.cover.paper) book.appendChild(wrap(freePage(z.cover, 'r', 46), true));
+  if (z.cover.bg || z.cover.paper || z.cover.bgImg || z.cover.items) book.appendChild(wrap(freePage(z.cover, 'r', 46), true));
   else book.appendChild(wrap(photoPage(z.cover.photo, z.cover.alt, z.cover.pos, z.cover.word, 'r', false, 46), true));
   if (z.pages) z.pages.forEach((p, i) => book.appendChild(wrap(freePage(p, i % 2 === 0 ? 'l' : 'r'))));
   else z.spreads.forEach((s, i) => {
     book.appendChild(wrap(photoPage(s.photo, s.alt, s.pos, s.wl, 'l', i % 2 === 1)));
     book.appendChild(wrap(photoPage(s.fx, s.altFx, s.pos, s.wr, 'r', i % 2 === 0)));
   });
-  if (z.pages && z.pages.length % 2) book.appendChild(wrap(freePage({ paper: z.cover.paper, lines: z.cover.lines, tex: z.cover.tex, texA: z.cover.texA, bg: z.cover.bg || '#FBF8EE' }, 'r')));
+  if (z.pages && z.pages.length % 2) book.appendChild(wrap(freePage({ paper: z.cover.paper, lines: z.cover.lines, tex: z.cover.tex, texA: z.cover.texA, bgImg: z.cover.bgImg, bg: z.cover.bg || "#FBF8EE" }, 'r')));
   if (z.noEnd){
     const q = el('div', 'pg free r' + (z.cover.paper ? ' paper' : '')); ZR.paper(q, z.cover, z.cover.paper ? '#FBF8EE' : '#F6F6F2');
     book.appendChild(wrap(q, true));
@@ -251,11 +255,14 @@ function openZine(id){
   });
   pf.loadFromHTML(book.querySelectorAll('.page'));
   hideAll(book);
-  pf.on('flip', () => { updatePos(); revealVisible(book); });
-  pf.on('changeOrientation', updatePos);
+  let ringBox = null;
+  if (z.rings){ ringBox = el('div'); ringBox.className = 'rings'; ringBox.setAttribute('aria-hidden', 'true'); ringBox.innerHTML = '<i></i><i></i><i></i>'; book.appendChild(ringBox); }
+  const updRings = () => { if (!ringBox) return; const i = pf.getCurrentPageIndex(), spread = pf.getOrientation() === 'landscape' && i > 0 && i < total - 1; ringBox.style.display = spread ? 'block' : 'none'; };
+  pf.on('flip', () => { updatePos(); revealVisible(book); updRings(); });
+  pf.on('changeOrientation', () => { updatePos(); updRings(); });
   fitWords();
   book.classList.add('ready');
-  updatePos();
+  updatePos(); updRings();
   if (canAnim) { gsap.from(book, { opacity: 0, y: 14, duration: .5, ease: 'power2.out' }); setTimeout(() => revealVisible(book), 120); }
   document.title = z.label;
   document.querySelectorAll('#picker button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === z.id)));

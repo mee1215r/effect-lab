@@ -177,6 +177,7 @@
         <button type="button" id="addImg" title="自分の絵(透明PNG)をステッカーにする">絵を入れる</button>
         <input type="file" id="file" accept="image/*" multiple class="hide">
         <input type="file" id="fileStk" accept="image/*" multiple class="hide">
+        <input type="file" id="fileDia" accept="image/*" class="hide">
       </div>
       <div class="chips" id="matTabs"></div>
       <div class="row" id="matColorRow"><span class="sub">色</span><span class="row" id="matColors"></span></div>
@@ -192,6 +193,9 @@
         <label class="sl">線の数 <input type="range" id="lines" min="8" max="60" value="24" aria-label="罫線の数"> <output id="linesV" style="min-width:2em;text-align:right"></output></label>
         <button type="button" id="linesAll">全ページに</button>
       </div>
+      <span class="sub">背景</span>
+      <div class="row"><button type="button" id="bgWood">木目</button><button type="button" id="bgNone">木目をやめる</button></div>
+      <div class="row"><button type="button" id="rings" aria-pressed="false">バインダーのリング(ZINE全体)</button></div>
       <span class="sub">質感</span>
       <div class="row">
         <button type="button" data-tex="none">なし</button>
@@ -564,8 +568,8 @@ function live(inp, apply, after){
   inp.addEventListener('change', () => { pushed = false; changed(); renderStrip(); renderLayers(); if (after) after(); });
 }
 function swatches(list, cur, fn){ const w = mk('span', 'row'); list.forEach(c => { const b = mk('button', 'sw'); b.type = 'button'; b.style.background = c; b.setAttribute('aria-label', '色'); b.setAttribute('aria-pressed', String(String(cur || '').toLowerCase() === c.toLowerCase())); b.onclick = () => fn(c); w.appendChild(b); }); return w; }
-const kindOf = o => o.pen ? 'pen' : o.txt != null ? 'txt' : o.tape ? 'tape' : o.shape ? (ZR.cat.lines.some(l => l[0] === o.shape) ? 'line' : ZR.cat.papers.some(l => l[0] === o.shape) ? 'paper' : 'shape') : 'img';
-const nameOf = o => { const k = kindOf(o); if (k === 'txt') return o.txt.replace(/\s+/g, ' ').slice(0, 14) || '文字'; if (k === 'tape') return 'マステ'; if (k === 'pen') return 'ペンの線'; if (k === 'img') return o.pic ? '写真' : (o.alt === '写真' ? '写真' : (o.alt || 'イラスト')); const all = ZR.cat.shapes.concat(ZR.cat.lines, ZR.cat.papers).find(a => a[0] === o.shape); return all ? all[1] : 'かたち'; };
+const kindOf = o => o.pen ? 'pen' : o.txt != null ? 'txt' : o.tape ? 'tape' : o.diary ? 'diary' : o.shape ? (ZR.cat.lines.some(l => l[0] === o.shape) ? 'line' : ZR.cat.papers.some(l => l[0] === o.shape) ? 'paper' : 'shape') : 'img';
+const nameOf = o => { const k = kindOf(o); if (k === 'txt') return o.txt.replace(/\s+/g, ' ').slice(0, 14) || '文字'; if (k === 'tape') return 'マステ'; if (k === 'diary') return '日記カード' + (o.diary.t ? '・' + o.diary.t : ''); if (k === 'pen') return 'ペンの線'; if (k === 'img') return o.pic ? '写真' : (o.alt === '写真' ? '写真' : (o.alt || 'イラスト')); const all = ZR.cat.shapes.concat(ZR.cat.lines, ZR.cat.papers).find(a => a[0] === o.shape); return all ? all[1] : 'かたち'; };
 const ICON = {
   front: '<svg viewBox="0 0 20 20"><rect x="7" y="7" width="10" height="10" rx="1"/><path d="M3 13V3h10"/></svg>',
   back: '<svg viewBox="0 0 20 20"><rect x="3" y="3" width="10" height="10" rx="1"/><path d="M7 17h10V7"/></svg>',
@@ -628,7 +632,7 @@ function distribute(axis){
   });
   render(); changed();
 }
-function flipSel(){ push(); const on = !SEL.every(o => o.f); SEL.forEach(o => { if (isPen(o) || o.txt != null || o.tape) return; if (on) o.f = 1; else delete o.f; const n = elOf(o); if (n) n.style.transform = ZR.tf(o); }); changed(); renderStrip(); buildCtx(); }
+function flipSel(){ push(); const on = !SEL.every(o => o.f); SEL.forEach(o => { if (isPen(o) || o.txt != null || o.tape || o.diary) return; if (on) o.f = 1; else delete o.f; const n = elOf(o); if (n) n.style.transform = ZR.tf(o); }); changed(); renderStrip(); buildCtx(); }
 function lockSel(){ push(); const on = !SEL.every(o => o.lk); SEL.forEach(o => { if (on) o.lk = 1; else delete o.lk; }); SEL = on ? [] : SEL; render(); changed(); }
 
 /* ---------- 上のバー ---------- */
@@ -665,7 +669,7 @@ function buildCtx(){
   c.appendChild(grp(ib(ICON.al, '左にそろえる', () => alignSel('l')), ib(ICON.ac, '左右の中央', () => alignSel('c')), ib(ICON.ar, '右にそろえる', () => alignSel('r')), ib(ICON.at, '上にそろえる', () => alignSel('t')), ib(ICON.am, '上下の中央', () => alignSel('m')), ib(ICON.ab, '下にそろえる', () => alignSel('b')),
     list.length > 2 ? ib(ICON.dh, '横に等間隔', () => distribute('h')) : null, list.length > 2 ? ib(ICON.dv, 'たてに等間隔', () => distribute('v')) : null));
   c.appendChild(grp(
-    list.some(o => !isPen(o) && o.txt == null && !o.tape) ? ib(ICON.flip, '左右反転', flipSel, list.every(o => o.f)) : null,
+    list.some(o => !isPen(o) && o.txt == null && !o.tape && !o.diary) ? ib(ICON.flip, '左右反転', flipSel, list.every(o => o.f)) : null,
     ib(ICON.lock, 'ロック(動かないようにする)', lockSel, false), ib(ICON.dup, '複製 (Ctrl+D)', () => dupSel()), ib(ICON.del, '削除 (Delete)', delSel)));
   if (list.length > 1) c.appendChild(mk('span', 'sub', list.length + '個を選択中'));
 }
@@ -707,6 +711,15 @@ function buildProps(){
     r3.appendChild(chip('なし', !o.hl, () => set(() => delete o.hl)));
     HL_COLORS.forEach(c => { const b = mk('button', 'sw'); b.type = 'button'; b.style.background = c; b.setAttribute('aria-label', 'マーカーの色'); b.setAttribute('aria-pressed', String(o.hl === c)); b.onclick = () => set(() => { o.hl = c; }); r3.appendChild(b); });
     box.appendChild(r3);
+  } else if (k === 'diary'){
+    box.appendChild(mk('b', '', '日記カード'));
+    const D = o.diary;
+    const pr = mk('div', 'row'); const pb = mk('button', '', D.src ? '写真をかえる' : '写真を入れる'); pb.type = 'button';
+    pb.onclick = () => { const f = $('fileDia'); f.onchange = async e => { const fl = e.target.files[0]; e.target.value = ''; if (!fl) return; try { const src = await shrink(fl, false); push(); D.src = src; redrawItem(o); changed(); renderStrip(); renderLayers(); buildProps(); } catch (er) { msg('この画像は読み込めませんでした'); } }; f.click(); };
+    pr.appendChild(pb); if (D.src) pr.appendChild(chip('写真をはずす', false, () => set(() => { delete D.src; }))); box.appendChild(pr);
+    const mkIn = (label, key, ph, rows) => { const w = mk('div', 'row'); w.appendChild(mk('label', 'sub', label)); const i = mk(rows ? 'textarea' : 'input'); if (!rows) i.type = 'text'; i.value = D[key] || ''; i.placeholder = ph; i.setAttribute('aria-label', label); if (!rows) i.style.cssText = 'flex:1;min-width:0;border:1px solid var(--line);border-radius:6px;padding:5px 8px;background:#fff'; let pu = false;
+      i.addEventListener('input', () => { if (!pu){ push(); pu = true; } D[key] = i.value; redrawItem(o); changed(); }); i.addEventListener('blur', () => { pu = false; renderStrip(); renderLayers(); }); if (rows) { i.style.minHeight = '84px'; w.style.flexDirection = 'column'; w.style.alignItems = 'stretch'; } w.appendChild(i); return w; };
+    box.appendChild(mkIn('日付', 'd', '11/28 (土)')); box.appendChild(mkIn('ひとこと', 't', '朝ごはん')); box.appendChild(mkIn('メモ', 'm', '作ったもの、味、思ったことなど', true));
   } else if (k === 'tape'){
     box.appendChild(mk('b', '', 'マステ'));
     const row = mk('div', 'row'); row.appendChild(swatches(TAPE_COLORS, o.c, c => set(() => { o.c = c; })));
@@ -741,6 +754,7 @@ function thumbOf(o){
   else if (k === 'txt'){ t.textContent = 'あ'; }
   else if (k === 'pen'){ t.textContent = '✎'; }
   else if (k === 'tape'){ t.style.background = o.c || '#F4A6B8'; }
+  else if (k === 'diary'){ if (o.diary.src){ const i = mk('img'); i.src = o.diary.src; i.alt = ''; t.appendChild(i); } else t.textContent = '日'; }
   else { const n = ZR.item({ shape: o.shape, c: o.c, sk: o.sk, w: 100, x: 0, y: 0 }, false); t.appendChild(n); }
   return t;
 }
@@ -771,7 +785,7 @@ function markLayers(){ const items = IT(); qa('#layers .ly').forEach(r => r.clas
 const PASTEL = ['#F4A6B8','#F1D56A','#8FB8E8','#A9D4A0','#F2A65A','#C9B3E6'];
 let pastelN = 0;
 const nextPastel = () => matColor || PASTEL[pastelN++ % PASTEL.length];
-const MAT_TABS = [['stk', 'ステッカー'], ['shp', 'かたち'], ['line', 'らくがき'], ['paper', '紙もの'], ['tape', 'マステ'], ['text', '文字']];
+const MAT_TABS = [['stk', 'ステッカー'], ['shp', 'かたち'], ['line', 'らくがき'], ['paper', '紙もの'], ['tape', 'マステ'], ['text', '文字'], ['dia', '日記']];
 function jitter(a){ return r1(a + (Math.random() * 10 - 5)); }
 function place(o){ if (o.x === 30 && o.y === 30){ o.x = r1(20 + Math.random() * 22); o.y = r1(18 + Math.random() * 30); } push(); IT().push(o); SEL = [o]; render(); changed(); }
 function buildMat(){
@@ -812,6 +826,13 @@ function buildMat(){
       grid.appendChild(b);
     });
     body.appendChild(grid);
+  } else if (matTab === 'dia'){
+    const add = mk('button', '', '日記カードを1枚足す'); add.type = 'button'; add.style.cssText = 'width:100%;padding:10px'; add.onclick = () => place({ diary: { d: '', t: '', m: '' }, x: 30, y: 30, w: 40, r: 0 }); body.appendChild(add);
+    body.appendChild(mk('p', 'sub', '写真・日付・ひとこと・メモが入る、ノート風のカードです。足したあと、右上で中身を書きます。'));
+    const tp = mk('button', '', '日記カードを4枚まとめて置く'); tp.type = 'button'; tp.style.cssText = 'width:100%;padding:10px;margin-top:6px';
+    tp.onclick = () => { push(); const p = P(); const cards = []; [[6, 5], [52, 5], [6, 50], [52, 50]].forEach(xy => cards.push({ diary: { d: '', t: '', m: '' }, x: xy[0], y: xy[1], w: 42, r: 0 })); cards.forEach(c => p.items.push(c)); SEL = []; render(); changed(); msg('日記カードを4枚置きました。1枚ずつ選んで、写真とメモを入れてください。'); };
+    body.appendChild(tp);
+    const wd = mk('button', '', 'ページを木目の背景にする'); wd.type = 'button'; wd.style.cssText = 'width:100%;padding:8px;margin-top:6px'; wd.onclick = () => { push(); P().bgImg = 'tex-wood.jpg'; paperStyle(P()); renderStrip(); changed(); }; body.appendChild(wd);
   } else {
     const presets = [
       ['見出し', { txt: 'タイトル', size: 9, fn: 'dela', ink: '#2a2a2a' }, 'font-family:"Dela Gothic One"'],
@@ -873,6 +894,9 @@ BG_PRESETS.forEach(c => { const b = mk('button', 'sw'); b.type = 'button'; b.sty
 $('paperColor').oninput = e => { P().bg = e.target.value; paperStyle(P()); };
 $('paperColor').onchange = () => { push(); renderStrip(); changed(); };
 qa('[data-paper]').forEach(b => b.onclick = () => { push(); const p = P(); if (b.dataset.paper === 'lined') p.paper = true; else delete p.paper; paperStyle(p); renderStrip(); changed(); });
+$('bgWood').onclick = () => { push(); P().bgImg = 'tex-wood.jpg'; paperStyle(P()); renderStrip(); changed(); };
+$('bgNone').onclick = () => { push(); delete P().bgImg; paperStyle(P()); renderStrip(); changed(); };
+$('rings').onclick = () => { push(); if (Z().rings) delete Z().rings; else Z().rings = 1; $('rings').setAttribute('aria-pressed', String(!!Z().rings)); changed(); msg(Z().rings ? 'ページの真ん中にリングが付きます(見た目の確認や公開で出ます)' : 'リングをはずしました'); };
 $('lines').oninput = e => { P().lines = +e.target.value; paperStyle(P()); };
 $('lines').onchange = () => { renderStrip(); changed(); };
 $('lines').onpointerdown = () => push();
@@ -958,7 +982,9 @@ function dataUrlBytes(u){ const b = atob(u.split(',')[1]), a = new Uint8Array(b.
 function buildFiles(){
   const out = JSON.parse(JSON.stringify(DATA)), files = [];
   out.forEach(z => { let n = 1; [z.cover].concat(z.pages || []).forEach(p => (p.items || []).forEach(it => {
-    if (typeof it.src === 'string' && it.src.startsWith('data:')){ const name = 'photos/u-' + Date.now().toString(36) + (n++) + (it.src.startsWith('data:image/png') ? '.png' : '.jpg'); files.push({ name: name, data: dataUrlBytes(it.src) }); it.src = name; }
+    [it, it.diary].forEach(o => {
+      if (o && typeof o.src === 'string' && o.src.startsWith('data:')){ const name = 'photos/u-' + Date.now().toString(36) + (n++) + (o.src.startsWith('data:image/png') ? '.png' : '.jpg'); files.push({ name: name, data: dataUrlBytes(o.src) }); o.src = name; }
+    });
   })); });
   const ver = new Date().toISOString().replace(/[:.]/g, '-');
   const js = '/* このファイルは edit.html の「公開する」「zipで保存」で作りなおされます。手で直してもかまいません。 */\nwindow.ZINES_VERSION = ' + JSON.stringify(ver) + ';\nwindow.ZINES = ' + JSON.stringify(out, null, 1) + ';\n';
@@ -1018,7 +1044,7 @@ $('publish').onclick = async () => {
 };
 
 
-buildMat(); buildCtx(); applyZoom(false);
+buildMat(); buildCtx(); applyZoom(false); $('rings').setAttribute('aria-pressed', String(!!Z().rings));
 fillSelect(); go(0);
 window.__zed = { DATA: () => DATA, P: () => P(), setMode: setMode, SEL: () => SEL, setSel: setSel };
 })();

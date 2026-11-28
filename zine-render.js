@@ -8,6 +8,13 @@
     '.pg img.stk.pic{border:2.4cqw solid #fff;box-sizing:content-box;filter:drop-shadow(0 .6cqw 1cqw rgba(0,0,0,.3))}',
     '.pg .txt{position:absolute;margin:0;font-family:"Klee One","Zen Kaku Gothic New","Hiragino Maru Gothic ProN",sans-serif;font-weight:600;line-height:1.35;white-space:pre;pointer-events:none;user-select:none}',
     '.pg .tape{position:absolute;margin:0;opacity:.88;pointer-events:none;clip-path:polygon(0 8%,2% 0,4% 8%,6% 0,8% 8%,10% 0,100% 0,100% 100%,10% 100%,8% 92%,6% 100%,4% 92%,2% 100%,0 92%);mix-blend-mode:multiply;box-shadow:0 .3cqw .6cqw rgba(0,0,0,.18)}',
+    '.pg .dia{position:absolute;aspect-ratio:.72;background:#fbfaf6;border:1px solid rgba(0,0,0,.1);box-shadow:0 .6cqw 1.6cqw rgba(0,0,0,.28);container-type:inline-size;display:flex;flex-direction:column;padding:4cqi 4cqi 3cqi;gap:3cqi;font-family:"Klee One","Zen Kaku Gothic New",sans-serif;color:#2a2a2a;overflow:hidden}',
+    '.pg .dia .dp{flex:0 0 49%;background:#e7e5df;border:1px solid rgba(0,0,0,.12);overflow:hidden;display:flex;align-items:center;justify-content:center;color:#a8a69e;font-size:6cqi}',
+    '.pg .dia .dp img{position:static;inset:auto;width:100%;height:100%;object-fit:cover;display:block}',
+    '.pg .dia .dm{flex:1;min-height:0;overflow:hidden;font-size:6cqi;line-height:9.2cqi;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(9.2cqi - 1px),rgba(110,140,190,.5) calc(9.2cqi - 1px),rgba(110,140,190,.5) 9.2cqi)}',
+    '.pg .dia .dh{color:#6b6a63;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.pg .dia .dh b{color:#2a2a2a;font-weight:600}',
+    '.pg .dia .db{white-space:pre-wrap;overflow-wrap:anywhere}',
     '.pg .shp{position:absolute;filter:drop-shadow(0 .5cqw .9cqw rgba(0,0,0,.22))}',
     '.pg .shp.ln{filter:none}',
     '.pg .shp svg{display:block;width:100%;height:100%;overflow:visible}',
@@ -165,6 +172,18 @@
   }
   if (document.body) ensureFilters(); else document.addEventListener('DOMContentLoaded', ensureFilters);
 
+
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function diaryEl(t){
+    var D = t.diary || {}, n = document.createElement('div');
+    n.className = 'dia stk';
+    n.innerHTML = '<div class="dp">' + (D.src ? '<img src="' + esc(D.src) + '" alt="' + esc(D.alt || D.t || '料理の写真') + '" draggable="false">' : '<span>写真</span>') + '</div>' +
+      '<div class="dm"><div class="dh">' + esc(D.d) + (D.t ? '　<b>' + esc(D.t) + '</b>' : '') + '</div><div class="db">' + esc(D.m) + '</div></div>';
+    n.style.left = t.x + '%'; n.style.top = t.y + '%'; n.style.width = t.w + '%';
+    applyTf(n, t);
+    return n;
+  }
+
   function pathD(p){
     if (!p.length) return '';
     if (p.length === 1) return 'M' + p[0][0] + ' ' + p[0][1] + 'l.01 0';
@@ -197,6 +216,7 @@
       }
       return n;
     }
+    if (t.diary) return diaryEl(t);
     if (t.shape) return shapeEl(t);
     if (t.tape){
       n = document.createElement('div'); n.className = 'tape';
@@ -238,6 +258,7 @@
     el.classList.toggle('paper', !!d.paper);
     el.style.background = '';
     el.style.backgroundColor = d.bg || def || '#FBF8EE';
+    if (d.bgImg){ el.style.backgroundImage = 'url("' + d.bgImg + '")'; el.style.backgroundSize = 'cover'; el.style.backgroundPosition = 'center'; }
     if (d.paper) lines(el, d);
     var old = el.querySelector(':scope > .tex'); if (old) old.remove();
     if (d.tex && d.tex !== 'none'){
@@ -246,5 +267,5 @@
       el.insertBefore(t, el.firstChild);
     }
   }
-  window.ZR = { cat: { shapes: SHAPE_LIST, lines: LINE_LIST.map(function(k){ return [k, LINES[k].n]; }), papers: PAPER_LIST.map(function(k){ return [k, PAPERS[k].n]; }) }, defColor: defColor, arOf: arOf, tf: tf, item: item, addItems: addItems, lines: lines, paper: paper };
+  window.ZR = { diaryTpl: function(){ return { diary: { d: '', t: '', m: '' } }; }, cat: { shapes: SHAPE_LIST, lines: LINE_LIST.map(function(k){ return [k, LINES[k].n]; }), papers: PAPER_LIST.map(function(k){ return [k, PAPERS[k].n]; }) }, defColor: defColor, arOf: arOf, tf: tf, item: item, addItems: addItems, lines: lines, paper: paper };
 })();
