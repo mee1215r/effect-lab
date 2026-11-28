@@ -19,7 +19,7 @@
     '.pg .shp.ln{filter:none}',
     '.pg .shp svg{display:block;width:100%;height:100%;overflow:visible}',
     '.pg svg.pen{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible}',
-    '.pg.paper{background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--lp,4.17%) - .15%),rgba(110,140,190,.42) calc(var(--lp,4.17%) - .15%),rgba(110,140,190,.42) var(--lp,4.17%))}',
+    '.pg .rule{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:block}',
     '.pg .tex{position:absolute;inset:0;pointer-events:none;z-index:0}',
     '.pg .tex{background-size:100% 100%;mix-blend-mode:soft-light}',
     '.pg .tex-grain{background-image:url(tex-grain.jpg)}',
@@ -251,7 +251,14 @@
     (items || []).forEach(function(t, i){ var n = item(t, hit); n.dataset.i = i; pg.appendChild(n); out.push(n); });
     return out;
   }
-  function lines(el, d){ el.style.setProperty('--lp', (100 / ((d && d.lines) || 24)).toFixed(3) + '%'); }
+  function lines(el, d){
+    var n = Math.max(2, Math.min(60, (d && d.lines) || 24)), s = document.createElementNS(NS, 'svg');
+    s.setAttribute('class', 'rule'); s.setAttribute('viewBox', '0 0 100 133.333'); s.setAttribute('preserveAspectRatio', 'none'); s.setAttribute('aria-hidden', 'true');
+    var h = '';
+    for (var k = 1; k <= n; k++){ var y = (133.333 * k / n).toFixed(3); h += 'M0 ' + y + 'H100'; }
+    var p = document.createElementNS(NS, 'path'); p.setAttribute('d', h); p.setAttribute('stroke', 'rgba(110,140,190,.5)'); p.setAttribute('stroke-width', '.22'); p.setAttribute('fill', 'none');
+    s.appendChild(p); el.insertBefore(s, el.firstChild);
+  }
   /* 紙の色・罫線・質感をまとめて決める。d: { paper(罫線), bg(色), lines(線の数), tex(質感), texA(濃さ 10-100) } */
   function paper(el, d, def){
     d = d || {};
@@ -259,6 +266,7 @@
     el.style.background = '';
     el.style.backgroundColor = d.bg || def || '#FBF8EE';
     if (d.bgImg){ el.style.backgroundImage = 'url("' + d.bgImg + '")'; el.style.backgroundSize = 'cover'; el.style.backgroundPosition = 'center'; }
+    var ro = el.querySelector(':scope > .rule'); if (ro) ro.remove();
     if (d.paper) lines(el, d);
     var old = el.querySelector(':scope > .tex'); if (old) old.remove();
     if (d.tex && d.tex !== 'none'){
